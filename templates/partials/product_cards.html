@@ -1,0 +1,81 @@
+{% load static %}
+
+<div class="products-container">
+    {% if category %}
+    <div class="category-header">
+        <h2>{{ category.name }}</h2>
+        <button class="back-button" onclick="showCategories()">
+            <i class="fas fa-arrow-left"></i> Назад к категориям
+        </button>
+    </div>
+    {% endif %}
+
+    <div class="products-grid">
+        {% for product in products %}
+        <div class="product-card">
+            <div class="product-image">
+                <div class="carousel">
+                    <div class="carousel-inner">
+                        {% for image in product.images.all %}
+                            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                <img src="{{ image.image.url }}" alt="{{ product.name }}" loading="lazy">
+                            </div>
+                        {% empty %}
+                            <div class="carousel-item active no-image">
+                                <i class="fas fa-image"></i>
+                                <p>Изображение отсутствует</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% if product.images.count > 1 %}
+                    <button class="carousel-control prev" onclick="moveCarousel(this, -1)">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="carousel-control next" onclick="moveCarousel(this, 1)">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                    <div class="carousel-indicators">
+                        {% for image in product.images.all %}
+                            <span class="indicator {% if forloop.first %}active{% endif %}" 
+                                  onclick="goToSlide(this.parentElement.parentElement, {{ forloop.counter0 }})"></span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="product-info">
+                <div>
+                    <h3>{{ product.name }}</h3>
+                    <p class="description">{{ product.description|truncatewords:15 }}</p>
+                </div>
+                <p class="price">{{ product.price }} руб.</p>
+            </div>
+        </div>
+        {% empty %}
+        <div class="no-products">
+            <i class="fas fa-box-open"></i>
+            <p>В данной категории пока нет товаров</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if products.has_other_pages %}
+    <div class="pagination">
+        {% if products.has_previous %}
+            <a href="#" class="page-link" data-page="{{ products.previous_page_number }}">&laquo;</a>
+        {% endif %}
+        
+        {% for num in products.paginator.page_range %}
+            {% if products.number == num %}
+                <span class="page-link active">{{ num }}</span>
+            {% else %}
+                <a href="#" class="page-link" data-page="{{ num }}">{{ num }}</a>
+            {% endif %}
+        {% endfor %}
+        
+        {% if products.has_next %}
+            <a href="#" class="page-link" data-page="{{ products.next_page_number }}">&raquo;</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>

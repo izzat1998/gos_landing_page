@@ -1,0 +1,29 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+
+# Django migrations
+*/migrations/
+!*/migrations/__init__.py
+*.sqlite3
+
+# Virtual environment
+venv/
+.env
+
+# Local configuration files
+*.local
+*.log
+
+# Sensitive information
+*.secret
+
+# IDE files
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Media files
+
+media/

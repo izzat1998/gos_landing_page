@@ -1,0 +1,45 @@
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;  /* Added this line to center text */
+    padding: 1rem 2rem;
+    background: transparent;
+    border: 1px solid currentColor;
+    color: inherit;
+    text-decoration: none;
+    font-size: 1rem;
+    position: relative;
+    overflow: hidden;
+    transition: var(--transition);
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 0.8s ease 0.4s forwards;
+}
+
+.btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--accent);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    z-index: -1;
+}
+
+.btn:hover {
+    color: var(--background);
+    border-color: var(--accent);
+}
+
+.btn:hover::after {
+    transform: translateX(0);
+}
+
+.btn i {
+    margin-left: 1rem;
+    transition: transform 0.3s ease;
+}
+
+.btn:hover i {
+    transform: translateX(5px);
+}

@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+
+{% block title %}Elegant Living | Modern Furniture{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<header id="home" class="hero">
+    <div class="hero-content">
+        <h1>Современный дизайн <br>для современного жилья</h1>
+        <p>Откройте для себя нашу кураторскую коллекцию современных предметов мебели, созданных для улучшения вашего пространства.</p>
+        <a href="{% url 'main_page' %}#collections" class="btn">Посмотреть коллекции <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <div class="hero-image"></div>
+</header>
+
+<!-- Collections Section -->
+<section id="collections" class="collections">
+    <div class="container">
+        <div class="section-header">
+            <h2>Наши Коллекции</h2>
+            <p>Откройте для себя наши уникальные коллекции</p>
+        </div>
+        
+        <div class="categories-container">
+            <div class="collection-grid">
+                {% for category in featured_categories %}
+                <div class="collection-item" data-category-id="{{ category.id }}">
+                    <a href="#">
+                        <img src="{{ category.image.url }}" alt="{{ category.name }}" loading="lazy">
+                        <div class="collection-info">
+                            <h3>{{ category.name }}</h3>
+                            <p>{{ category.description }}</p>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="products-container" style="display: none;">
+            <!-- Products will be loaded here -->
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section id="about" class="about">
+    <div class="container">
+        <div class="section-header">
+            <h2>Наше обязательство</h2>
+        </div>
+        <div class="about-grid">
+            <div class="about-item">
+                <i class="fas fa-award"></i>
+                <h3>Премиум качество</h3>
+                <p>Изготовлено с исключительными материалами и вниманием к деталям</p>
+            </div>
+            <div class="about-item">
+                <i class="fas fa-truck"></i>
+                <h3>Доставка с белыми перчатками</h3>
+                <p>Профессиональная доставка и сборка</p>
+            </div>
+            <div class="about-item">
+                <i class="fas fa-infinity"></i>
+                <h3>Гарантия на всю жизнь</h3>
+                <p>Наше обязательство к качеству на долгие годы</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section id="contact" class="contact">
+    <div class="container">
+        <div class="section-header">
+            <h2>Свяжитесь с нами</h2>
+        </div>
+        <div class="contact-grid">
+            <form class="contact-form">
+                <input type="text" class="form-control" placeholder="Имя" required>
+                <input type="email" class="form-control" placeholder="Электронная почта" required>
+                <textarea class="form-control" placeholder="Сообщение" rows="5" required></textarea>
+                <button type="submit" class="btn">Отправить сообщение <i class="fas fa-paper-plane"></i></button>
+            </form>
+            <div class="contact-info">
+                <div class="about-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <h3>Посетите нас</h3>
+                    <p>123 Дизайнерский район, Креативный город</p>
+                </div>
+                <div class="about-item">
+                    <i class="fas fa-phone"></i>
+                    <h3>Позвоните нам</h3>
+                    <p>+1 (555) 123-4567</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const collectionGrid = document.querySelector('.collection-grid');
+    const productsContainer = document.querySelector('.products-container');
+    const categoriesContainer = document.querySelector('.categories-container');
+    
+    // Function to show categories
+    window.showCategories = function() {
+        if (categoriesContainer) {
+            categoriesContainer.style.display = 'block';
+        }
+        if (productsContainer) {
+            productsContainer.style.display = 'none';
+        }
+        // Reset the collection grid to its original state
+        if (collectionGrid) {
+            collectionGrid.style.display = 'grid';
+        }
+    };
+
+    // Function to show products
+    function showProducts() {
+        if (categoriesContainer) {
+            categoriesContainer.style.display = 'none';
+        }
+        if (productsContainer) {
+            productsContainer.style.display = 'block';
+        }
+    }
+
+    // Function to load products for a category
+    async function loadCategoryProducts(categoryId, page = 1) {
+        try {
+            const response = await fetch(`{% url 'products:get-category-products' %}?category_id=${categoryId}&page=${page}`, {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            if (data.html) {
+                productsContainer.innerHTML = data.html;
+                showProducts(); // Show products after loading
+                // Attach pagination event listeners
+                attachPaginationListeners(categoryId);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+    
+    // Function to attach pagination event listeners
+    function attachPaginationListeners(categoryId) {
+        const paginationLinks = document.querySelectorAll('.page-link');
+        paginationLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const page = link.dataset.page;
+                loadCategoryProducts(categoryId, page);
+            });
+        });
+    }
+    
+    // Carousel functions
+    window.moveCarousel = function(button, direction) {
+        const carousel = button.parentElement;
+        const inner = carousel.querySelector('.carousel-inner');
+        const items = carousel.querySelectorAll('.carousel-item');
+        const indicators = carousel.querySelectorAll('.indicator');
+        
+        let activeIndex = [...items].findIndex(item => item.classList.contains('active'));
+        let newIndex = activeIndex + direction;
+        
+        if (newIndex < 0) newIndex = items.length - 1;
+        if (newIndex >= items.length) newIndex = 0;
+        
+        items[activeIndex].classList.remove('active');
+        items[newIndex].classList.add('active');
+        
+        if (indicators.length) {
+            indicators[activeIndex].classList.remove('active');
+            indicators[newIndex].classList.add('active');
+        }
+        
+        inner.style.transform = `translateX(-${newIndex * 100}%)`;
+    }
+    
+    window.goToSlide = function(carousel, index) {
+        const items = carousel.querySelectorAll('.carousel-item');
+        const indicators = carousel.querySelectorAll('.indicator');
+        const inner = carousel.querySelector('.carousel-inner');
+        
+        const activeItem = carousel.querySelector('.carousel-item.active');
+        const activeIndicator = carousel.querySelector('.indicator.active');
+        
+        if (activeItem) activeItem.classList.remove('active');
+        if (activeIndicator) activeIndicator.classList.remove('active');
+        
+        items[index].classList.add('active');
+        indicators[index].classList.add('active');
+        inner.style.transform = `translateX(-${index * 100}%)`;
+    }
+    
+    // Attach click events to collection items
+    const collectionItems = document.querySelectorAll('.collection-item');
+    collectionItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const categoryId = item.dataset.categoryId;
+            loadCategoryProducts(categoryId);
+        });
+    });
+});
+</script>
+{% endblock %}

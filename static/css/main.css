@@ -1,0 +1,37 @@
+:root {
+    --primary: #1a1a1a;
+    --secondary: #f4f4f4;
+    --accent: #d4a373;
+    --text: #333333;
+    --background: #ffffff;
+    --transition: all 0.3s ease;
+}
+
+.dark-mode {
+    --primary: #f4f4f4;
+    --secondary: #1a1a1a;
+    --text: #ffffff;
+    --background: #121212;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 5vw;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+    color: var(--text);
+    background: var(--background);
+    transition: var(--transition);
+}
+
+
