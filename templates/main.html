@@ -86,12 +86,14 @@
                 <div class="about-item">
                     <i class="fas fa-map-marker-alt"></i>
                     <h3>Посетите нас</h3>
-                    <p>123 Дизайнерский район, Креативный город</p>
+                    <p>Буйук ипак йули, 233</p>
                 </div>
                 <div class="about-item">
                     <i class="fas fa-phone"></i>
                     <h3>Позвоните нам</h3>
-                    <p>+1 (555) 123-4567</p>
+                    <p>+998910172324</p>
+                    <p>+998998460907</p>
+                    <p>+998941612021</p>
                 </div>
             </div>
         </div>
@@ -150,6 +152,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 showProducts(); // Show products after loading
                 // Attach pagination event listeners
                 attachPaginationListeners(categoryId);
+                // Initialize carousels for new products
+                initializeCarousels();
             }
         } catch (error) {
             console.error('Error:', error);
@@ -168,9 +172,33 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
+    // Function to initialize all carousels
+    function initializeCarousels() {
+        const carousels = document.querySelectorAll('.carousel');
+        carousels.forEach(carousel => {
+            const items = carousel.querySelectorAll('.carousel-item');
+            if (items.length > 1) {
+                // Reset carousel state
+                items.forEach((item, index) => {
+                    item.classList.remove('active');
+                    if (index === 0) item.classList.add('active');
+                });
+
+                const inner = carousel.querySelector('.carousel-inner');
+                if (inner) inner.style.transform = 'translateX(0)';
+
+                const indicators = carousel.querySelectorAll('.indicator');
+                indicators.forEach((indicator, index) => {
+                    indicator.classList.remove('active');
+                    if (index === 0) indicator.classList.add('active');
+                });
+            }
+        });
+    }
+    
     // Carousel functions
     window.moveCarousel = function(button, direction) {
-        const carousel = button.parentElement;
+        const carousel = button.closest('.carousel');
         const inner = carousel.querySelector('.carousel-inner');
         const items = carousel.querySelectorAll('.carousel-item');
         const indicators = carousel.querySelectorAll('.indicator');
@@ -181,6 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (newIndex < 0) newIndex = items.length - 1;
         if (newIndex >= items.length) newIndex = 0;
         
+        // Update active classes
         items[activeIndex].classList.remove('active');
         items[newIndex].classList.add('active');
         
@@ -189,6 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
             indicators[newIndex].classList.add('active');
         }
         
+        // Move the carousel
         inner.style.transform = `translateX(-${newIndex * 100}%)`;
     }
     
@@ -197,14 +227,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const indicators = carousel.querySelectorAll('.indicator');
         const inner = carousel.querySelector('.carousel-inner');
         
-        const activeItem = carousel.querySelector('.carousel-item.active');
-        const activeIndicator = carousel.querySelector('.indicator.active');
+        // Find current active index
+        const currentIndex = [...items].findIndex(item => item.classList.contains('active'));
         
-        if (activeItem) activeItem.classList.remove('active');
-        if (activeIndicator) activeIndicator.classList.remove('active');
-        
+        // Update active classes
+        items[currentIndex].classList.remove('active');
         items[index].classList.add('active');
-        indicators[index].classList.add('active');
+        
+        if (indicators.length) {
+            indicators[currentIndex].classList.remove('active');
+            indicators[index].classList.add('active');
+        }
+        
+        // Move the carousel
         inner.style.transform = `translateX(-${index * 100}%)`;
     }
     
