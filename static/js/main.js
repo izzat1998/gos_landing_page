@@ -37,10 +37,17 @@ window.addEventListener('scroll', () => {
 // Smooth scroll
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        document.querySelector(this.getAttribute('href')).scrollIntoView({
-            behavior: 'smooth'
-        });
+        const targetId = this.getAttribute('href');
+        // Check if the href is just # or empty
+        if (targetId === '#') return;
+
+        const targetElement = document.querySelector(targetId);
+        if (targetElement) {
+            e.preventDefault();
+            targetElement.scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
     });
 });
 
@@ -91,30 +98,43 @@ if (form) {
 }
 
 // Cube animations
-function createCube() {
-    const heroImage = document.querySelector('.hero-image');
-    const cube = document.createElement('div');
-    cube.classList.add('cube');
-    
-    const size = Math.random() * 40 + 20;
-    cube.style.width = `${size}px`;
-    cube.style.height = `${size}px`;
-    
-    const startPosition = Math.random() * 100;
-    cube.style.left = `${startPosition}%`;
-    
-    const duration = Math.random() * 4 + 4;
-    cube.style.animationDuration = `${duration}s`;
-    
-    const rotation = Math.random() * 360;
-    cube.style.transform = `rotate(${rotation}deg)`;
-    
-    heroImage.appendChild(cube);
-    
-    setTimeout(() => {
-        cube.remove();
-    }, duration * 1000);
-}
+const heroImage = document.querySelector('.hero-image');
+if (heroImage) {
+    function createCube() {
+        const cube = document.createElement('div');
+        cube.classList.add('cube');
 
-// Create new cube every 300ms
-setInterval(createCube, 300);
+        // Use transform for better performance
+        const size = Math.random() * 40 + 20;
+        const startPosition = Math.random() * 100;
+        const rotation = Math.random() * 360;
+
+        cube.style.cssText = `
+            width: ${size}px;
+            height: ${size}px;
+            left: ${startPosition}%;
+            animation-duration: ${Math.random() * 4 + 4}s;
+            transform: rotate(${rotation}deg);
+        `;
+
+        heroImage.appendChild(cube);
+
+        // Use requestAnimationFrame for cleanup
+        requestAnimationFrame(() => {
+            cube.addEventListener('animationend', () => {
+                cube.remove();
+            }, { once: true });
+        });
+    }
+
+    // Use requestIdleCallback if available
+    const createCubeWrapper = () => {
+        if ('requestIdleCallback' in window) {
+            requestIdleCallback(createCube);
+        } else {
+            createCube();
+        }
+    };
+
+    setInterval(createCubeWrapper, 300);
+}
