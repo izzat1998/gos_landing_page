@@ -113,7 +113,7 @@ if (heroImage) {
             width: ${size}px;
             height: ${size}px;
             left: ${startPosition}%;
-            animation-duration: ${Math.random() * 2 + 4}s;
+            animation-duration: ${Math.random() * 1 + 2}s;
             transform: rotate(${rotation}deg);
         `;
 
