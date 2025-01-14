@@ -25,7 +25,7 @@ document.querySelectorAll('.section-header, .collection-item, .about-item, .cont
 });
 
 // Navbar scroll effect
-window.addEventListener('scroll', () => {   
+window.addEventListener('scroll', () => {
     const navbar = document.querySelector('.navbar');
     if (window.scrollY > 50) {
         navbar.classList.add('scrolled');
@@ -59,7 +59,7 @@ if (darkModeToggle) {
         const icon = darkModeToggle.querySelector('i');
         icon.classList.toggle('fa-moon');
         icon.classList.toggle('fa-sun');
-        
+
         // Save preference
         const isDarkMode = document.body.classList.contains('dark-mode');
         localStorage.setItem('darkMode', isDarkMode);
@@ -77,18 +77,18 @@ const form = document.querySelector('.contact-form');
 if (form) {
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
+
         // Add loading state
         const submitBtn = form.querySelector('button[type="submit"]');
         const originalText = submitBtn.innerHTML;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Отправка...';
-        
+
         // Simulate form submission (replace with actual API call)
         await new Promise(resolve => setTimeout(resolve, 1500));
-        
+
         // Show success message
         submitBtn.innerHTML = '<i class="fas fa-check"></i> Отправлено!';
-        
+
         // Reset form after delay
         setTimeout(() => {
             submitBtn.innerHTML = originalText;
@@ -105,7 +105,7 @@ if (heroImage) {
         cube.classList.add('cube');
 
         // Use transform for better performance
-        const size = Math.random() * 40 + 20;
+        const size = Math.random() * 100 + 15;
         const startPosition = Math.random() * 100;
         const rotation = Math.random() * 360;
 
@@ -113,7 +113,7 @@ if (heroImage) {
             width: ${size}px;
             height: ${size}px;
             left: ${startPosition}%;
-            animation-duration: ${Math.random() * 4 + 4}s;
+            animation-duration: ${Math.random() * 2 + 4}s;
             transform: rotate(${rotation}deg);
         `;
 
@@ -136,5 +136,5 @@ if (heroImage) {
         }
     };
 
-    setInterval(createCubeWrapper, 300);
+    setInterval(createCubeWrapper, 1000);
 }
