@@ -1,4 +1,5 @@
 from PIL import Image
+from PIL.Image import Resampling
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
@@ -8,6 +9,31 @@ class Category(models.Model):
     name = models.CharField(max_length=50)
     description = models.TextField()
     image = models.ImageField(upload_to='category_images/')
+
+
+
+    def clean(self):
+        if self.image:
+            if self.image.file.size > 5 * 1024 * 1024:  # 5MB limit
+                raise ValidationError("Максимальный размер файла 5MB")
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+        if self.image:
+            with Image.open(self.image.path) as img:
+                # Convert to RGB if image is in RGBA mode
+                if img.mode in ('RGBA', 'P'):
+                    img = img.convert('RGB')
+
+                # Resize if larger than 800x800
+                if img.height > 800 or img.width > 800:
+                    output_size = (800, 800)
+                    img.thumbnail(output_size, Resampling.LANCZOS)  # Changed this line
+
+                # Save with optimization
+                img.save(self.image.path, 'JPEG', quality=70, optimize=True)
 
     def __str__(self):
         return self.name
@@ -54,9 +80,17 @@ class ProductImage(models.Model):
 
         if self.image:
             with Image.open(self.image.path) as img:
+                # Convert to RGB if image is in RGBA mode
+                if img.mode in ('RGBA', 'P'):
+                    img = img.convert('RGB')
+
+                # Resize if larger than 1200x1200
                 if img.height > 1200 or img.width > 1200:
-                    img.thumbnail((1200, 1200))
-                    img.save(self.image.path)
+                    output_size = (1200, 1200)
+                    img.thumbnail(output_size, Resampling.LANCZOS)
+
+                # Save with optimization
+                img.save(self.image.path, 'JPEG', quality=75, optimize=True)
 
     def __str__(self):
         return f"Image for {self.product.name}"
