@@ -1,99 +1,99 @@
         /* Mobile Menu Styles */
-.mobile-menu-button {
-    display: none;
-    background: none;
-    border: none;   
-    cursor: pointer;
-    padding: 0.5rem;
-    z-index: 1001;
-}
-
-.hamburger-line {
-    display: block;
-    width: 24px;
-    height: 2px;
-    background-color: var(--accent);
-    margin: 5px 0;
-    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
-}
-
-@media (max-width: 768px) {
-    .mobile-menu-button {
-        display: block;
-        position: relative;
-    }
-
-    .nav-links {
-        position: fixed;
-        top: 0;
-        right: -100%;
-        width: 100%;
-        height: 100vh;
-        background: var(--primary);
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        gap: 2rem;
-        transition: all 0.3s ease-in-out;
-        opacity: 0;
-        visibility: hidden;
-        z-index: 1000;
-    }
-
-    .nav-links.active {
-        right: 0;
-        opacity: 1;
-        visibility: visible;
-    }
-
-    .nav-links a {
-        font-size: 1.5rem;
-        color: var(--accent);
-    }
-
-    /* Animated hamburger to X */
-    .mobile-menu-button.active .hamburger-line:nth-child(1) {
-        transform: translateY(7px) rotate(45deg);
-    }
-
-    .mobile-menu-button.active .hamburger-line:nth-child(2) {
-        opacity: 0;
-    }
-
-    .mobile-menu-button.active .hamburger-line:nth-child(3) {
-        transform: translateY(-7px) rotate(-45deg);
-    }
-
-    .hero {
-        padding: 120px 1rem 60px;
-        text-align: center;
-    }
-
-    .hero-content h1 {
-        font-size: 2.5rem;
-    }
-
-    .hero-content p {
-        font-size: 1rem;
-    }
-
-    .section-header h2 {
-        font-size: 2rem;
-    }
-
-    .collection-grid,
-    .about-grid {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-        padding: 0 1rem;
-    }
-
-    .collection-item img {
-        height: 250px;
-    }
-
-    .contact-form {
-        padding: 0 1rem;
-    }
-}
+        .mobile-menu-button {
+            display: none;
+            background: none;
+            border: none;   
+            cursor: pointer;
+            padding: 0.5rem;
+            z-index: 1001;
+        }
+        
+        .hamburger-line {
+            display: block;
+            width: 24px;
+            height: 2px;
+            background-color: var(--accent);
+            margin: 5px 0;
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-menu-button {
+                display: block;
+                position: relative;
+            }
+        
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 100%;
+                height: 100vh;
+                background: var(--primary);
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                gap: 2rem;
+                transition: all 0.3s ease-in-out;
+                opacity: 0;
+                visibility: hidden;
+                z-index: 1000;
+            }
+        
+            .nav-links.active {
+                right: 0;
+                opacity: 1;
+                visibility: visible;
+            }
+        
+            .nav-links a {
+                font-size: 1.5rem;
+                color: var(--accent);
+            }
+        
+            /* Animated hamburger to X */
+            .mobile-menu-button.active .hamburger-line:nth-child(1) {
+                transform: translateY(7px) rotate(45deg);
+            }
+        
+            .mobile-menu-button.active .hamburger-line:nth-child(2) {
+                opacity: 0;
+            }
+        
+            .mobile-menu-button.active .hamburger-line:nth-child(3) {
+                transform: translateY(-7px) rotate(-45deg);
+            }
+        
+            .hero {
+                padding: 120px 1rem 60px;
+                text-align: center;
+            }
+        
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+        
+            .hero-content p {
+                font-size: 1rem;
+            }
+        
+            .section-header h2 {
+                font-size: 2rem;
+            }
+        
+            .collection-grid,
+            .about-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+                padding: 0 1rem;
+            }
+        
+            .collection-item img {
+                height: 250px;
+            }
+        
+            .contact-form {
+                padding: 0 1rem;
+            }
+        }
