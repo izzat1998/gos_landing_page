@@ -101,6 +101,12 @@ if (form) {
 const heroImage = document.querySelector('.hero-image');
 if (heroImage) {
     function createCube() {
+        // Check if we already have 6 cubes
+        const existingCubes = heroImage.querySelectorAll('.cube');
+        if (existingCubes.length >= 6) {
+            return;
+        }
+
         const cube = document.createElement('div');
         cube.classList.add('cube');
 
@@ -108,12 +114,13 @@ if (heroImage) {
         const size = Math.random() * 100 + 15;
         const startPosition = Math.random() * 100;
         const rotation = Math.random() * 360;
+        const duration = Math.random() * 1 + 6; // Random duration between 6-7 seconds
 
         cube.style.cssText = `
             width: ${size}px;
             height: ${size}px;
             left: ${startPosition}%;
-            animation-duration: ${Math.random() * 1 + 2}s;
+            animation-duration: ${duration}s;
             transform: rotate(${rotation}deg);
         `;
 
@@ -136,5 +143,5 @@ if (heroImage) {
         }
     };
 
-    setInterval(createCubeWrapper, 1000);
+    setInterval(createCubeWrapper, 1500); // Increased interval to account for longer animation duration
 }
