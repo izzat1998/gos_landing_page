@@ -1,53 +1,162 @@
 .hero {
-    height: 100vh;
-    background: var(--primary);
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    align-items: center;
     position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
     overflow: hidden;
+    background: var(--background);
+}
+
+.parallax-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    transform: translateZ(0);
+    will-change: transform;
+}
+
+.pattern-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: radial-gradient(var(--accent) 1px, transparent 1px);
+    background-size: 50px 50px;
+    opacity: 0.1;
+    animation: patternMove 20s linear infinite;
 }
 
 .hero-content {
-    padding-left: 5vw;
-    color: var(--background);
+    position: relative;
     z-index: 2;
-    transition: var(--transition);
+    max-width: 800px;
+    margin-left: 10%;
+    padding: 2rem;
 }
 
-.hero h1 {
-    font-size: clamp(2.5rem, 5vw, 4.5rem);
-    font-weight: 300;
+.slide-in-text {
+    opacity: 0;
+    transform: translateX(-50px);
+    animation: slideIn 0.8s ease forwards;
+}
+
+.hero-content h1 {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
     line-height: 1.2;
+    animation-delay: 0.2s;
+}
+
+.hero-content p {
+    font-size: 1.2rem;
     margin-bottom: 2rem;
-    letter-spacing: -2px;
-    opacity: 0;
-    transform: translateY(30px);
-    animation: fadeInUp 0.8s ease forwards;
+    line-height: 1.6;
+    animation-delay: 0.4s;
 }
 
-.hero p {
-    font-size: clamp(1rem, 1.5vw, 1.25rem);
-    margin-bottom: 3rem;
-    max-width: 500px;
-    opacity: 0;
-    transform: translateY(30px);
-    animation: fadeInUp 0.8s ease 0.2s forwards;
-}
-
-@keyframes fadeInUp {
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.hero-cta-buttons {
+    animation-delay: 0.6s;
 }
 
 .hero-image {
-    position: relative;
-    width: 100%;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 50%;
     height: 100%;
-    background: var(--background);
-    overflow: hidden;
-    clip-path: polygon(15% 0, 100% 0, 100% 100%, 0% 100%);
-    transition: var(--transition);
+    z-index: 1;
+}
+
+.floating-element {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    background: var(--accent);
+    border-radius: 20px;
+    opacity: 0.1;
+}
+
+.floating-element:nth-child(1) {
+    top: 20%;
+    right: 30%;
+    animation: float 6s ease-in-out infinite;
+}
+
+.floating-element:nth-child(2) {
+    top: 50%;
+    right: 10%;
+    width: 150px;
+    height: 150px;
+    animation: float 8s ease-in-out infinite;
+    animation-delay: -2s;
+}
+
+.floating-element:nth-child(3) {
+    top: 70%;
+    right: 25%;
+    width: 80px;
+    height: 80px;
+    animation: float 7s ease-in-out infinite;
+    animation-delay: -4s;
+}
+
+@keyframes slideIn {
+    0% {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-20px) rotate(5deg);
+    }
+}
+
+@keyframes patternMove {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: 50px 50px;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .hero-content {
+        margin-left: 5%;
+    }
+
+    .hero-content h1 {
+        font-size: 3rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-content {
+        margin: 0 auto;
+        text-align: center;
+        padding: 2rem 1rem;
+    }
+
+    .hero-content h1 {
+        font-size: 2.5rem;
+    }
+
+    .hero-image {
+        display: none;
+    }
 }

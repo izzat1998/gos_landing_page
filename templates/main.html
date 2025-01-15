@@ -1,37 +1,71 @@
 {% extends 'base.html' %}
 
-{% block title %}Elegant Living | Modern Furniture{% endblock %}
+{% block title %}GOSMEBEL{% endblock %}
 
 {% block content %}
 <!-- Hero Section -->
 <header id="home" class="hero">
-    <div class="hero-content">
-        <h1>Современный дизайн <br>для современного жилья</h1>
-        <p>Откройте для себя нашу кураторскую коллекцию современных предметов мебели, созданных для улучшения вашего пространства.</p>
-        <a href="{% url 'main_page' %}#collections" class="btn">Посмотреть коллекции <i class="fas fa-arrow-right"></i></a>
+    <div class="parallax-background">
+        <div class="pattern-overlay"></div>
     </div>
-    <div class="hero-image"></div>
+    <div class="hero-content">
+        <h1 class="slide-in-text">Современный дизайн <br>для современного жилья</h1>
+        <p class="slide-in-text">Откройте для себя нашу кураторскую коллекцию современных предметов мебели, созданных для улучшения вашего пространства.</p>
+        <div class="hero-cta-buttons slide-in-text">
+            <a href="#contact" class="btn btn-primary">Получить консультацию <i class="fas fa-headset"></i></a>
+            <a href="{% url 'main_page' %}#collections" class="btn btn-secondary">Посмотреть коллекции <i class="fas fa-arrow-right"></i></a>
+        </div>
+    </div>
+    <div class="hero-image">
+        <div class="floating-element" data-speed="1.2"></div>
+        <div class="floating-element" data-speed="0.8"></div>
+        <div class="floating-element" data-speed="1.5"></div>
+    </div>
 </header>
 
 <!-- Collections Section -->
-<section id="collections" class="collections">
+<section id="collections" class="collections scroll-reveal">
     <div class="container">
-        <div class="section-header">
+        <div class="section-header fade-up">
             <h2>Наши Коллекции</h2>
             <p>Откройте для себя наши уникальные коллекции</p>
         </div>
         
         <div class="categories-container">
-            <div class="collection-grid">
+            <div class="collection-grid stagger-fade">
                 {% for category in featured_categories %}
                 <div class="collection-item" data-category-id="{{ category.id }}">
-                    <a href="#">
-                        <img src="{{ category.image.url }}" alt="{{ category.name }}" loading="lazy">
-                        <div class="collection-info">
-                            <h3>{{ category.name }}</h3>
-                            <p>{{ category.description }}</p>
+                    <div class="collection-card">
+                        <!-- Front side -->
+                        <div class="card-front">
+                            <div class="image-container">
+                                <img src="{{ category.image.url }}" alt="{{ category.name }}" loading="lazy">
+                                <div class="image-overlay">
+                                    <div class="overlay-content">
+                                        <h3>{{ category.name }}</h3>
+                                        <p>{{ category.description }}</p>
+                                    </div>
+                                </div>
+                                <div class="split-overlay">
+                                    <div class="split-top"></div>
+                                    <div class="split-bottom"></div>
+                                </div>
+                            </div>
                         </div>
-                    </a>
+                        <!-- Back side -->
+                        <div class="card-back">
+                            <div class="back-content">
+                                <h3>{{ category.name }}</h3>
+                                <p>{{ category.description }}</p>
+                                <ul class="category-details">
+                                    <li><i class="fas fa-check"></i> Индивидуальный дизайн</li>
+                                    <li><i class="fas fa-check"></i> Премиум материалы</li>
+                                    <li><i class="fas fa-check"></i> Гарантия качества</li>
+                                </ul>
+                                <button class="btn btn-secondary">Подробнее</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 {% endfor %}
             </div>
@@ -39,6 +73,105 @@
         
         <div class="products-container" style="display: none;">
             <!-- Products will be loaded here -->
+        </div>
+    </div>
+</section>
+
+<!-- Why Choose Us Section -->
+<section id="why-choose-us" class="why-choose-us scroll-reveal">
+    <div class="container">
+        <div class="section-header fade-up">
+            <h2>Почему выбирают нас</h2>
+            <p>Мы создаем не просто мебель, а пространство для жизни</p>
+        </div>
+        
+        <div class="features-grid stagger-fade">
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-pencil-ruler"></i>
+                </div>
+                <h3>Индивидуальный дизайн</h3>
+                <p>Создаем уникальные решения, учитывая ваши потребности и стиль жизни</p>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-certificate"></i>
+                </div>
+                <h3>10+ лет опыта</h3>
+                <p>Многолетний опыт в создании качественной мебели и довольных клиентов</p>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-tools"></i>
+                </div>
+                <h3>Современное производство</h3>
+                <p>Используем передовое оборудование и инновационные технологии</p>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h3>Точные сроки</h3>
+                <p>Гарантируем своевременное выполнение заказа и доставку</p>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-hand-holding-heart"></i>
+                </div>
+                <h3>Гарантия качества</h3>
+                <p>Предоставляем длительную гарантию на всю нашу продукцию</p>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-comments-dollar"></i>
+                </div>
+                <h3>Гибкая оплата</h3>
+                <p>Предлагаем удобные условия оплаты и рассрочку</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Statistics Section -->
+<section id="statistics" class="statistics scroll-reveal">
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-item fade-up">
+                <div class="stat-number">
+                    <span class="counter" data-target="1500">0</span>
+                    <span class="plus">+</span>
+                </div>
+                <h3>Довольных клиентов</h3>
+            </div>
+            
+            <div class="stat-item fade-up" data-delay="200">
+                <div class="stat-number">
+                    <span class="counter" data-target="10">0</span>
+                    <span>лет</span>
+                </div>
+                <h3>На рынке</h3>
+            </div>
+            
+            <div class="stat-item fade-up" data-delay="400">
+                <div class="stat-number">
+                    <span class="counter" data-target="2000">0</span>
+                    <span class="plus">+</span>
+                </div>
+                <h3>Выполненных проектов</h3>
+            </div>
+            
+            <div class="stat-item fade-up" data-delay="600">
+                <div class="stat-number">
+                    <span class="counter" data-target="98">0</span>
+                    <span>%</span>
+                </div>
+                <h3>Положительных отзывов</h3>
+            </div>
         </div>
     </div>
 </section>

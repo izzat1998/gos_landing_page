@@ -2,7 +2,7 @@
     position: fixed;
     width: 100%;
     z-index: 1000;
-    padding: 2rem 0;
+    padding: 1.5rem 0;
     transition: var(--transition);
     background: transparent;
 }
@@ -19,6 +19,12 @@
     align-items: center;
 }
 
+.nav-left, .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
 .logo {
     font-size: 1.5rem;
     font-weight: 600;
@@ -28,10 +34,29 @@
     transition: var(--transition);
 }
 
+.phone-number {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: var(--transition);
+}
+
+.phone-number i {
+    font-size: 1.1rem;
+}
+
+.phone-number:hover {
+    color: var(--accent-hover);
+}
+
 .nav-links {
     display: flex;
     gap: 3rem;
     list-style: none;
+    margin: 0 2rem;
 }
 
 .nav-links a {
@@ -51,11 +76,27 @@
     width: 0;
     height: 2px;
     background: var(--accent);
-    transition: width 0.3s ease;
+    transition: var(--transition);
 }
 
 .nav-links a:hover::after {
     width: 100%;
+}
+
+.cta-button {
+    background: var(--accent);
+    color: var(--primary);
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+
+.cta-button:hover {
+    background: var(--accent-hover);
+    transform: translateY(-2px);
 }
 
 .dark-mode-toggle {
@@ -71,4 +112,151 @@
 
 .dark-mode-toggle:hover {
     transform: rotate(45deg);
+}
+
+/* Mobile Menu Styles */
+.mobile-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    background: var(--primary);
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.mobile-menu.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.mobile-menu-button {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 1.5rem;
+    cursor: pointer;
+    z-index: 1000;
+    padding: 0.5rem;
+    transition: var(--transition);
+}
+
+.mobile-menu-button:hover {
+    color: var(--accent-hover);
+}
+
+.mobile-menu-close {
+    position: fixed;
+    top: 1.5rem;
+    right: 1.5rem;
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 1.5rem;
+    cursor: pointer;
+    z-index: 1001;
+    padding: 0.5rem;
+    transition: var(--transition);
+}
+
+.mobile-menu-close:hover {
+    color: var(--accent-hover);
+    transform: rotate(90deg);
+}
+
+.mobile-nav-links {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.mobile-nav-links a {
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 1.5rem;
+    font-weight: 500;
+    transition: var(--transition);
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 0.5rem 0;
+}
+
+.mobile-nav-links a:hover {
+    color: var(--accent-hover);
+    transform: translateX(5px);
+}
+
+.mobile-cta {
+    margin-top: 3rem;
+}
+
+@media (max-width: 1024px) {
+    .phone-number {
+        display: none;
+    }
+    
+    .nav-links {
+        gap: 2rem;
+        margin: 0 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .nav-links, .cta-button {
+        display: none;
+    }
+    
+    .mobile-menu-button {
+        display: block;
+    }
+
+    .mobile-menu {
+        padding: 2rem 0;
+    }
+
+    .navbar.mobile-menu-open {
+        background: transparent;
+        box-shadow: none;
+    }
+
+    body.menu-open {
+        overflow: hidden;
+        position: fixed;
+        width: 100%;
+    }
+}
+
+@media (max-height: 600px) {
+    .mobile-nav-links {
+        gap: 1.5rem;
+    }
+
+    .mobile-nav-links a {
+        font-size: 1.25rem;
+    }
+
+    .mobile-cta {
+        margin-top: 2rem;
+    }
 }

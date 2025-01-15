@@ -1,4 +1,3 @@
-
 // Loading Screen
 window.addEventListener('load', () => {
     const loadingScreen = document.querySelector('.loading-screen');
@@ -20,7 +19,7 @@ const observer = new IntersectionObserver((entries) => {
 }, observerOptions);
 
 // Observe elements
-document.querySelectorAll('.section-header, .collection-item, .about-item, .contact-form').forEach(el => {
+document.querySelectorAll('.section-header, .collection-item, .about-item, .contact-form, .feature-item').forEach(el => {
     observer.observe(el);
 });
 
@@ -96,6 +95,134 @@ if (form) {
         }, 3000);
     });
 }
+
+// Parallax Effect
+const parallaxBackground = document.querySelector('.parallax-background');
+const heroContent = document.querySelector('.hero-content');
+const floatingElements = document.querySelectorAll('.floating-element');
+
+window.addEventListener('scroll', () => {
+    const scrolled = window.pageYOffset;
+    
+    if (parallaxBackground) {
+        parallaxBackground.style.transform = `translateY(${scrolled * 0.5}px)`;
+    }
+    
+    if (heroContent) {
+        heroContent.style.transform = `translateY(${scrolled * 0.3}px)`;
+    }
+    
+    floatingElements.forEach(element => {
+        const speed = element.getAttribute('data-speed');
+        element.style.transform = `translateY(${scrolled * speed}px)`;
+    });
+});
+
+// Mobile Menu Toggle
+const mobileMenuButton = document.querySelector('.mobile-menu-button');
+const mobileMenuClose = document.querySelector('.mobile-menu-close');
+const mobileMenu = document.querySelector('.mobile-menu');
+const navbar = document.querySelector('.navbar');
+
+function toggleMobileMenu() {
+    mobileMenu.classList.toggle('active');
+    navbar.classList.toggle('mobile-menu-open');
+    document.body.classList.toggle('menu-open');
+}
+
+if (mobileMenuButton && mobileMenuClose) {
+    mobileMenuButton.addEventListener('click', toggleMobileMenu);
+    mobileMenuClose.addEventListener('click', toggleMobileMenu);
+    
+    // Close menu when clicking on a link
+    const mobileLinks = document.querySelectorAll('.mobile-nav-links a');
+    mobileLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            toggleMobileMenu();
+        });
+    });
+}
+
+// Animation Observer Setup
+const animationObserverOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+};
+
+// Unified Observer for all animations
+const animationObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            // Add visible class
+            entry.target.classList.add('visible');
+            
+            // Handle staggered children
+            if (entry.target.classList.contains('stagger-fade')) {
+                const children = entry.target.children;
+                Array.from(children).forEach((child, index) => {
+                    setTimeout(() => {
+                        child.classList.add('visible');
+                    }, index * 100);
+                });
+            }
+            
+            // Handle counter animation
+            if (entry.target.classList.contains('counter')) {
+                startCounter(entry.target);
+            }
+            
+            // Unobserve after animation
+            animationObserver.unobserve(entry.target);
+        }
+    });
+}, animationObserverOptions);
+
+// Counter Animation Function
+function startCounter(counterElement) {
+    const target = parseInt(counterElement.getAttribute('data-target'));
+    const duration = 2000; // 2 seconds
+    const step = target / (duration / 16); // 60fps
+    let current = 0;
+    
+    counterElement.classList.add('counting');
+    
+    const updateCounter = () => {
+        current += step;
+        if (current < target) {
+            counterElement.textContent = Math.round(current);
+            requestAnimationFrame(updateCounter);
+        } else {
+            counterElement.textContent = target;
+            counterElement.classList.remove('counting');
+        }
+    };
+    
+    requestAnimationFrame(updateCounter);
+}
+
+// Observe all animated elements
+document.querySelectorAll('.scroll-reveal, .fade-up, .stagger-fade > *, .counter').forEach(element => {
+    animationObserver.observe(element);
+});
+
+// Initialize slide-in animations
+const slideInElements = document.querySelectorAll('.slide-in-text');
+const slideInObserver = new IntersectionObserver(
+    (entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.animationPlayState = 'running';
+                observer.unobserve(entry.target);
+            }
+        });
+    },
+    { threshold: 0.1 }
+);
+
+slideInElements.forEach(element => {
+    element.style.animationPlayState = 'paused';
+    slideInObserver.observe(element);
+});
 
 // Cube animations
 const heroImage = document.querySelector('.hero-image');
