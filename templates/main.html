@@ -216,10 +216,11 @@
                 <button type="submit" class="btn">Отправить сообщение <i class="fas fa-paper-plane"></i></button>
             </form>
             <div class="contact-info">
-                <div class="about-item">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <h3>Посетите нас</h3>
-                    <p>Буйук ипак йули, 233</p>
+                <div class="about-item location-card">
+                    <h3 class="location-title">Работа</h3>
+                    <p class="location-address">Ташкент, улица Буюк Ипак Йули, 233</p>
+                    <p class="location-coordinates">Координаты: <span class="coordinate-values">41.334487, 69.352042</span> <i class="fas fa-copy"></i></p>
+
                 </div>
                 <div class="about-item">
                     <i class="fas fa-phone"></i>
@@ -385,6 +386,22 @@ document.addEventListener('DOMContentLoaded', () => {
             loadCategoryProducts(categoryId);
         });
     });
+
+    // Initialize copy coordinates functionality
+    const copyIcon = document.querySelector('.location-coordinates i.fa-copy');
+    if (copyIcon) {
+        copyIcon.addEventListener('click', function() {
+            const coordinates = document.querySelector('.coordinate-values').textContent;
+            navigator.clipboard.writeText(coordinates).then(() => {
+                // Optional: Show a small tooltip or change icon temporarily
+                const originalClass = copyIcon.className;
+                copyIcon.className = 'fas fa-check';
+                setTimeout(() => {
+                    copyIcon.className = originalClass;
+                }, 1500);
+            });
+        });
+    }
 });
 </script>
 {% endblock %}
