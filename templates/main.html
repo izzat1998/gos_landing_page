@@ -1,407 +1,219 @@
-{% extends 'base.html' %}
 
-{% block title %}GOSMEBEL{% endblock %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
 
-{% block content %}
-<!-- Hero Section -->
-<header id="home" class="hero">
-    <div class="parallax-background">
-        <div class="pattern-overlay"></div>
-    </div>
-    <div class="hero-content">
-        <h1 class="slide-in-text">Современный дизайн <br>для современного жилья</h1>
-        <p class="slide-in-text">Откройте для себя нашу кураторскую коллекцию современных предметов мебели, созданных для улучшения вашего пространства.</p>
-        <div class="hero-cta-buttons slide-in-text">
-            <a href="#contact" class="btn btn-primary">Получить консультацию <i class="fas fa-headset"></i></a>
-            <a href="{% url 'main_page' %}#collections" class="btn btn-secondary">Посмотреть коллекции <i class="fas fa-arrow-right"></i></a>
-        </div>
-    </div>
-    <div class="hero-image">
-        <div class="floating-element" data-speed="1.2"></div>
-        <div class="floating-element" data-speed="0.8"></div>
-        <div class="floating-element" data-speed="1.5"></div>
-    </div>
-</header>
-
-<!-- Collections Section -->
-<section id="collections" class="collections scroll-reveal">
-    <div class="container">
-        <div class="section-header fade-up">
-            <h2>Наши Коллекции</h2>
-            <p>Откройте для себя наши уникальные коллекции</p>
-        </div>
-        
-        <div class="categories-container">
-            <div class="collection-grid stagger-fade">
-                {% for category in featured_categories %}
-                <div class="collection-item" data-category-id="{{ category.id }}">
-                    <div class="collection-card">
-                        <!-- Front side -->
-                        <div class="card-front">
-                            <div class="image-container">
-                                <img src="{{ category.image.url }}" alt="{{ category.name }}" loading="lazy">
-                                <div class="image-overlay">
-                                    <div class="overlay-content">
-                                        <h3>{{ category.name }}</h3>
-                                        <p>{{ category.description }}</p>
-                                    </div>
-                                </div>
-                                <div class="split-overlay">
-                                    <div class="split-top"></div>
-                                    <div class="split-bottom"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Back side -->
-                        <div class="card-back">
-                            <div class="back-content">
-                                <h3>{{ category.name }}</h3>
-                                <p>{{ category.description }}</p>
-                                <ul class="category-details">
-                                    <li><i class="fas fa-check"></i> Индивидуальный дизайн</li>
-                                    <li><i class="fas fa-check"></i> Премиум материалы</li>
-                                    <li><i class="fas fa-check"></i> Гарантия качества</li>
-                                </ul>
-                                <button class="btn btn-secondary">Подробнее</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-        
-        <div class="products-container" style="display: none;">
-            <!-- Products will be loaded here -->
-        </div>
-    </div>
-</section>
-
-<!-- Why Choose Us Section -->
-<section id="why-choose-us" class="why-choose-us scroll-reveal">
-    <div class="container">
-        <div class="section-header fade-up">
-            <h2>Почему выбирают нас</h2>
-            <p>Мы создаем не просто мебель, а пространство для жизни</p>
-        </div>
-        
-        <div class="features-grid stagger-fade">
-            <div class="feature-item">
-                <div class="feature-icon">
-                    <i class="fas fa-pencil-ruler"></i>
-                </div>
-                <h3>Индивидуальный дизайн</h3>
-                <p>Создаем уникальные решения, учитывая ваши потребности и стиль жизни</p>
-            </div>
-            
-            <div class="feature-item">
-                <div class="feature-icon">
-                    <i class="fas fa-certificate"></i>
-                </div>
-                <h3>10+ лет опыта</h3>
-                <p>Многолетний опыт в создании качественной мебели и довольных клиентов</p>
-            </div>
-            
-            <div class="feature-item">
-                <div class="feature-icon">
-                    <i class="fas fa-tools"></i>
-                </div>
-                <h3>Современное производство</h3>
-                <p>Используем передовое оборудование и инновационные технологии</p>
-            </div>
-            
-            <div class="feature-item">
-                <div class="feature-icon">
-                    <i class="fas fa-clock"></i>
-                </div>
-                <h3>Точные сроки</h3>
-                <p>Гарантируем своевременное выполнение заказа и доставку</p>
-            </div>
-            
-            <div class="feature-item">
-                <div class="feature-icon">
-                    <i class="fas fa-hand-holding-heart"></i>
-                </div>
-                <h3>Гарантия качества</h3>
-                <p>Предоставляем длительную гарантию на всю нашу продукцию</p>
-            </div>
-            
-            <div class="feature-item">
-                <div class="feature-icon">
-                    <i class="fas fa-comments-dollar"></i>
-                </div>
-                <h3>Гибкая оплата</h3>
-                <p>Предлагаем удобные условия оплаты и рассрочку</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Statistics Section -->
-<section id="statistics" class="statistics scroll-reveal">
-    <div class="container">
-        <div class="stats-grid">
-            <div class="stat-item fade-up">
-                <div class="stat-number">
-                    <span class="counter" data-target="1500">0</span>
-                    <span class="plus">+</span>
-                </div>
-                <h3>Довольных клиентов</h3>
-            </div>
-            
-            <div class="stat-item fade-up" data-delay="200">
-                <div class="stat-number">
-                    <span class="counter" data-target="10">0</span>
-                    <span>лет</span>
-                </div>
-                <h3>На рынке</h3>
-            </div>
-            
-            <div class="stat-item fade-up" data-delay="400">
-                <div class="stat-number">
-                    <span class="counter" data-target="2000">0</span>
-                    <span class="plus">+</span>
-                </div>
-                <h3>Выполненных проектов</h3>
-            </div>
-            
-            <div class="stat-item fade-up" data-delay="600">
-                <div class="stat-number">
-                    <span class="counter" data-target="98">0</span>
-                    <span>%</span>
-                </div>
-                <h3>Положительных отзывов</h3>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- About Section -->
-<section id="about" class="about">
-    <div class="container">
-        <div class="section-header">
-            <h2>Наше обязательство</h2>
-        </div>
-        <div class="about-grid">
-            <div class="about-item">
-                <i class="fas fa-award"></i>
-                <h3>Премиум качество</h3>
-                <p>Изготовлено с исключительными материалами и вниманием к деталям</p>
-            </div>
-            <div class="about-item">
-                <i class="fas fa-truck"></i>
-                <h3>Доставка с белыми перчатками</h3>
-                <p>Профессиональная доставка и сборка</p>
-            </div>
-            <div class="about-item">
-                <i class="fas fa-infinity"></i>
-                <h3>Гарантия на всю жизнь</h3>
-                <p>Наше обязательство к качеству на долгие годы</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Contact Section -->
-<section id="contact" class="contact">
-    <div class="container">
-        <div class="section-header">
-            <h2>Свяжитесь с нами</h2>
-        </div>
-        <div class="contact-grid">
-            <form class="contact-form">
-                <input type="text" class="form-control" placeholder="Имя" required>
-                <input type="email" class="form-control" placeholder="Электронная почта" required>
-                <textarea class="form-control" placeholder="Сообщение" rows="5" required></textarea>
-                <button type="submit" class="btn">Отправить сообщение <i class="fas fa-paper-plane"></i></button>
-            </form>
-            <div class="contact-info">
-                <div class="about-item location-card">
-                    <h3 class="location-title">Адрес</h3>
-                    <p class="location-address">Ташкент, улица Буюк Ипак Йули, 233</p>
-                    <p class="location-coordinates"><small>Координаты: <span class="coordinate-values">41.334487, 69.352042</span></small></p>
-
-                </div>
-                <div class="about-item">
-                    <i class="fas fa-phone"></i>
-                    <h3>Позвоните нам</h3>
-                    <p>+998910172324</p>
-                    <p>+998998460907</p>
-                    <p>+998941612021</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-{% endblock %}
-{% block extra_js %}
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const collectionGrid = document.querySelector('.collection-grid');
-    const productsContainer = document.querySelector('.products-container');
-    const categoriesContainer = document.querySelector('.categories-container');
-    
-    // Function to show categories
-    window.showCategories = function() {
-        if (categoriesContainer) {
-            categoriesContainer.style.display = 'block';
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GOS - Мебель на заказ</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            /* Выберите подходящий шрифт, можно Google Fonts */
+            background-color: #FFFFFF;
+            /* Белый фон */
+            color: #1A4314;
+            /* Темно-зеленый текст */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
         }
-        if (productsContainer) {
-            productsContainer.style.display = 'none';
-        }
-        // Reset the collection grid to its original state
-        if (collectionGrid) {
-            collectionGrid.style.display = 'grid';
-        }
-    };
 
-    // Function to show products
-    function showProducts() {
-        if (categoriesContainer) {
-            categoriesContainer.style.display = 'none';
+        .logo-container img {
+            max-width: 180px;
+            /* Размер лого */
+            margin-bottom: 25px;
         }
-        if (productsContainer) {
-            productsContainer.style.display = 'block';
-        }
-    }
 
-    // Function to load products for a category
-    async function loadCategoryProducts(categoryId, page = 1) {
-        try {
-            const response = await fetch(`{% url 'products:get-category-products' %}?category_id=${categoryId}&page=${page}`, {
-                method: 'GET',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                }
-            });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const data = await response.json();
-            if (data.html) {
-                productsContainer.innerHTML = data.html;
-                showProducts(); // Show products after loading
-                // Attach pagination event listeners
-                attachPaginationListeners(categoryId);
-                // Initialize carousels for new products
-                initializeCarousels();
-            }
-        } catch (error) {
-            console.error('Error:', error);
+        h1 {
+            font-size: 2.2em;
+            /* Крупный заголовок */
+            margin-bottom: 10px;
+            font-weight: bold;
+            /* Можно попробовать шрифт с засечками, похожий на "GOS", если найдете подходящий веб-шрифт */
         }
-    }
-    
-    // Function to attach pagination event listeners
-    function attachPaginationListeners(categoryId) {
-        const paginationLinks = document.querySelectorAll('.page-link');
-        paginationLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const page = link.dataset.page;
-                loadCategoryProducts(categoryId, page);
-            });
-        });
-    }
-    
-    // Function to initialize all carousels
-    function initializeCarousels() {
-        const carousels = document.querySelectorAll('.carousel');
-        carousels.forEach(carousel => {
-            const items = carousel.querySelectorAll('.carousel-item');
-            if (items.length > 1) {
-                // Reset carousel state
-                items.forEach((item, index) => {
-                    item.classList.remove('active');
-                    if (index === 0) item.classList.add('active');
-                });
 
-                const inner = carousel.querySelector('.carousel-inner');
-                if (inner) inner.style.transform = 'translateX(0)';
-
-                const indicators = carousel.querySelectorAll('.indicator');
-                indicators.forEach((indicator, index) => {
-                    indicator.classList.remove('active');
-                    if (index === 0) indicator.classList.add('active');
-                });
-            }
-        });
-    }
-    
-    // Carousel functions
-    window.moveCarousel = function(button, direction) {
-        const carousel = button.closest('.carousel');
-        const inner = carousel.querySelector('.carousel-inner');
-        const items = carousel.querySelectorAll('.carousel-item');
-        const indicators = carousel.querySelectorAll('.indicator');
-        
-        let activeIndex = [...items].findIndex(item => item.classList.contains('active'));
-        let newIndex = activeIndex + direction;
-        
-        if (newIndex < 0) newIndex = items.length - 1;
-        if (newIndex >= items.length) newIndex = 0;
-        
-        // Update active classes
-        items[activeIndex].classList.remove('active');
-        items[newIndex].classList.add('active');
-        
-        if (indicators.length) {
-            indicators[activeIndex].classList.remove('active');
-            indicators[newIndex].classList.add('active');
+        p.tagline {
+            font-size: 1.2em;
+            /* Подзаголовок/слоган */
+            margin-bottom: 30px;
+            opacity: 0.9;
         }
-        
-        // Move the carousel
-        inner.style.transform = `translateX(-${newIndex * 100}%)`;
-    }
-    
-    window.goToSlide = function(carousel, index) {
-        const items = carousel.querySelectorAll('.carousel-item');
-        const indicators = carousel.querySelectorAll('.indicator');
-        const inner = carousel.querySelector('.carousel-inner');
-        
-        // Find current active index
-        const currentIndex = [...items].findIndex(item => item.classList.contains('active'));
-        
-        // Update active classes
-        items[currentIndex].classList.remove('active');
-        items[index].classList.add('active');
-        
-        if (indicators.length) {
-            indicators[currentIndex].classList.remove('active');
-            indicators[index].classList.add('active');
-        }
-        
-        // Move the carousel
-        inner.style.transform = `translateX(-${index * 100}%)`;
-    }
-    
-    // Attach click events to collection items
-    const collectionItems = document.querySelectorAll('.collection-item');
-    collectionItems.forEach(item => {
-        item.addEventListener('click', (e) => {
-            e.preventDefault();
-            const categoryId = item.dataset.categoryId;
-            loadCategoryProducts(categoryId);
-        });
-    });
 
-    // Initialize copy coordinates functionality
-    const copyIcon = document.querySelector('.location-coordinates i.fa-copy');
-    if (copyIcon) {
-        copyIcon.addEventListener('click', function() {
-            const coordinates = document.querySelector('.coordinate-values').textContent;
-            navigator.clipboard.writeText(coordinates).then(() => {
-                // Optional: Show a small tooltip or change icon temporarily
-                const originalClass = copyIcon.className;
-                copyIcon.className = 'fas fa-check';
-                setTimeout(() => {
-                    copyIcon.className = originalClass;
-                }, 1500);
-            });
-        });
-    }
-});
-</script>
-{% endblock %}
+        .cta-button,
+        .social-button {
+            display: inline-block;
+            background-color: #1A4314;
+            /* Темно-зеленая кнопка */
+            color: #FFFFFF;
+            /* Белый текст на кнопке */
+            padding: 18px 35px;
+            font-size: 1.3em;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 50px;
+            /* Округлые края, как у символа в лого */
+            margin-bottom: 20px;
+            transition: transform 0.2s ease, background-color 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            border: 2px solid #1A4314;
+            /* Белая рамка */
+        }
+
+        .social-button {
+            margin-left: 15px;
+            padding: 18px 25px;
+            background: linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D, #F56040, #F77737);
+            border: none;
+        }
+
+        .cta-button:hover {
+            transform: scale(1.05);
+            background-color: #265920;
+            /* Легкое изменение цвета при наведении */
+        }
+
+        .social-button:hover {
+            transform: scale(1.05);
+            filter: brightness(1.1);
+        }
+
+        .phone-link {
+            display: block;
+            /* Чтобы занимал всю ширину, если нужно */
+            font-size: 1.1em;
+            color: #1A4314;
+            text-decoration: none;
+            margin-top: 15px;
+            opacity: 0.8;
+        }
+
+        .phone-link:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+
+        .benefits {
+            margin-top: 30px;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .benefits ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .benefits li {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* Центрируем иконку и текст */
+        }
+
+        .benefits li::before {
+            /* Используем псевдоэлемент для "галочки" или точки */
+            content: '✔';
+            /* Или '•' */
+            color: #1A4314;
+            /* Белая галочка/точка */
+            font-size: 1.2em;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        footer {
+            margin-top: 40px;
+            font-size: 0.8em;
+            opacity: 0.7;
+        }
+
+        .address {
+            margin-top: 30px;
+            padding: 15px;
+            border-top: 1px solid rgba(26, 67, 20, 0.2);
+            border-bottom: 1px solid rgba(26, 67, 20, 0.2);
+            font-size: 1em;
+            line-height: 1.5;
+        }
+
+        .address-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .kitchen-image {
+            margin: 30px 0;
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .image-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="logo-container">
+        <!-- Вставьте ваш логотип сюда -->
+        <img src="{% static 'images/logo1.png' %}" alt="Логотип GOS Мебель">
+    </div>
+
+    <h1>Не успели вовремя? Мебель в подарок!</h1>
+    <p class="tagline">Гарантия сроков или компенсация – ваш выбор.</p>
+
+    <div class="image-container">
+        <img src="{% static 'images/image.png' %}" alt="Кухня на заказ" class="kitchen-image">
+    </div>
+
+    <div style="display: flex; justify-content: center; flex-wrap: wrap;">
+        <a href="tel:+998903564334" class="cta-button">
+            📞 Обсудить проект
+        </a>
+        <a href="https://www.instagram.com/gos.mebel.uz" target="_blank" class="social-button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white"
+                style="vertical-align: middle; margin-right: 8px;">
+                <path
+                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+            </svg>
+            Instagram
+        </a>
+    </div>
+    <p style="margin-bottom: 25px;">или</p>
+    <a href="tel:+998903564334" class="phone-link">Позвоните нам: +998 90 356 43 34</a>
+
+
+    <div class="benefits">
+        <ul>
+            <li>Индивидуальный дизайн-проект</li>
+            <li>Высококачественные материалы</li>
+            <li>Точные сроки изготовления</li>
+            <li>Бесплатная консультация и замер</li>
+        </ul>
+    </div>
+
+    <div class="address">
+        <div class="address-title">Адрес</div>
+        Ташкент, улица Буюк Ипак Йули, 233
+    </div>
+
+    <footer>
+        © 2023 GOS Мебельная Компания. Все права защищены.
+    </footer>
+
+</body>
+
+</html>
