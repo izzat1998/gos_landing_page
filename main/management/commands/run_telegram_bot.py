@@ -95,7 +95,6 @@ class QRStatsBot:
         self.app.add_handler(CommandHandler("stats", self.cmd_stats))
         self.app.add_handler(CommandHandler("allstats", self.cmd_allstats))
         self.app.add_handler(CommandHandler("compare", self.cmd_compare))
-        self.app.add_handler(CommandHandler("dashboard", self.cmd_dashboard))
         # callback queries
         self.app.add_handler(CallbackQueryHandler(self.cb_handler))
         # global error handler
@@ -115,8 +114,7 @@ class QRStatsBot:
             text += (
                 "\n\n🔐 *Admin*\n"
                 "/allstats [d] — статистика по всем локациям\n"
-                "/compare — сравнить локации\n"
-                "/dashboard — интерактивная панель"
+                "/compare — сравнить локации"
             )
         await update.message.reply_text(text, parse_mode="Markdown")
 
@@ -363,12 +361,12 @@ class QRStatsBot:
 
 class Command(BaseCommand):
     help = "Run the Telegram QR statistics bot"
-    
+
     def handle(self, *args, **options):
         self.stdout.write(self.style.SUCCESS("Starting Telegram bot..."))
         bot = QRStatsBot()
         bot.run()
-        
+
 
 if __name__ == "__main__":
     QRStatsBot().run()
