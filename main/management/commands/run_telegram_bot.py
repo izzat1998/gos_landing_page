@@ -20,24 +20,27 @@ from main.models import Location, QRCodeScan
 User = get_user_model()
 logger = logging.getLogger(__name__)
 
-# List of admin usernames who can access admin commands
-ADMIN_USERNAMES = ["Iforce706", "subanovsh"]  # Add your admin Telegram usernames here
+# Список имен пользователей администраторов, которые могут получить доступ к командам администратора
+ADMIN_USERNAMES = [
+    "Iforce706",
+    "subanovsh",
+]  # Добавьте сюда имена пользователей Telegram администраторов
 
 
 class Command(BaseCommand):
-    help = "Runs the Telegram bot for QR code statistics"
+    help = "Запускает Telegram бота для статистики QR-кодов"
 
     def handle(self, *args, **kwargs):
-        # Set up logging
+        # Настройка логирования
         logging.basicConfig(
             format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
             level=logging.INFO,
         )
 
-        # Create the application
+        # Создание приложения
         application = ApplicationBuilder().token(settings.TELEGRAM_BOT_TOKEN).build()
 
-        # Add command handlers
+        # Добавление обработчиков команд
         application.add_handler(CommandHandler("start", self.start_command))
         application.add_handler(CommandHandler("stats", self.stats_command))
         application.add_handler(CommandHandler("help", self.help_command))
@@ -46,86 +49,88 @@ class Command(BaseCommand):
         application.add_handler(CommandHandler("compare", self.compare_command))
         application.add_handler(CommandHandler("dashboard", self.dashboard_command))
 
-        # Add callback query handler for inline buttons
+        # Добавление обработчика запросов обратного вызова для встроенных кнопок
         application.add_handler(CallbackQueryHandler(self.button_callback))
 
-        self.stdout.write("Starting Telegram bot...")
+        self.stdout.write("Запуск Telegram бота...")
         application.run_polling()
 
     def is_admin(self, username):
-        """Check if the username is in the admin list"""
+        """Проверяет, находится ли имя пользователя в списке администраторов"""
         return username in ADMIN_USERNAMES
 
     async def start_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Send a welcome message when the command /start is issued."""
+        """Отправляет приветственное сообщение при вызове команды /start."""
         user = update.effective_user
         is_admin = self.is_admin(user.username)
 
         welcome_message = (
-            f"👋 Welcome to the GOS Furniture QR Code Statistics Bot, {user.first_name}!\n\n"
-            "Use /stats to see QR code scan statistics\n"
-            "Use /help to see available commands"
+            f"👋 Добро пожаловать в бот статистики QR-кодов GOS Furniture, {user.first_name}!\n\n"
+            "Используйте /stats для просмотра статистики сканирований QR-кодов\n"
+            "Используйте /help для просмотра доступных команд"
         )
 
         if is_admin:
-            welcome_message += "\n\n🔐 *Admin Commands*\n"
-            welcome_message += "/admin - Show admin commands\n"
-            welcome_message += "/allstats - View statistics for all locations\n"
-            welcome_message += "/compare - Compare statistics between locations\n"
-            welcome_message += "/dashboard - View interactive dashboard"
+            welcome_message += "\n\n🔐 *Команды администратора*\n"
+            welcome_message += "/admin - Показать команды администратора\n"
+            welcome_message += "/allstats - Просмотр статистики по всем локациям\n"
+            welcome_message += "/compare - Сравнить статистику между локациями\n"
+            welcome_message += "/dashboard - Просмотр интерактивной панели"
 
         await update.message.reply_text(welcome_message, parse_mode="Markdown")
 
     async def help_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Send a help message when the command /help is issued."""
+        """Отправляет справочное сообщение при вызове команды /help."""
         user = update.effective_user
         is_admin = self.is_admin(user.username)
 
         help_message = (
-            "Available commands:\n\n"
-            "/stats - View QR code scan statistics\n"
-            "/stats 7 - View statistics for the last 7 days\n"
-            "/help - Show this help message"
+            "Доступные команды:\n\n"
+            "/stats - Просмотр статистики сканирований QR-кодов\n"
+            "/stats 7 - Просмотр статистики за последние 7 дней\n"
+            "/help - Показать это справочное сообщение"
         )
 
         if is_admin:
-            help_message += "\n\n🔐 *Admin Commands*\n"
-            help_message += "/admin - Show admin commands\n"
-            help_message += "/allstats - View statistics for all locations\n"
-            help_message += "/allstats 7 - View all stats for last 7 days\n"
-            help_message += "/compare - Compare statistics between locations\n"
-            help_message += "/dashboard - View interactive dashboard"
+            help_message += "\n\n🔐 *Команды администратора*\n"
+            help_message += "/admin - Показать команды администратора\n"
+            help_message += "/allstats - Просмотр статистики по всем локациям\n"
+            help_message += (
+                "/allstats 7 - Просмотр всей статистики за последние 7 дней\n"
+            )
+            help_message += "/compare - Сравнить статистику между локациями\n"
+            help_message += "/dashboard - Просмотр интерактивной панели"
 
         await update.message.reply_text(help_message, parse_mode="Markdown")
 
     async def admin_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Show admin commands"""
+        """Показывает команды администратора"""
         user = update.effective_user
 
         if not self.is_admin(user.username):
             await update.message.reply_text(
-                "⛔ You don't have permission to use admin commands."
+                "⛔ У вас нет разрешения на использование команд администратора."
             )
             return
 
         admin_message = (
-            "🔐 *Admin Commands*\n\n"
-            "/allstats - View statistics for all locations\n"
-            "/allstats 7 - View all stats for last 7 days\n"
-            "/compare - Compare statistics between locations\n"
-            "/dashboard - View interactive dashboard with buttons"
+            "🔐 *Команды администратора*\n\n"
+            "/allstats - Просмотр статистики по всем локациям\n"
+            "/allstats 7 - Просмотр всей статистики за последние 7 дней\n"
+            "/compare - Сравнить статистику между локациями\n"
+            "/dashboard - Просмотр интерактивной панели с кнопками"
         )
 
         await update.message.reply_text(admin_message, parse_mode="Markdown")
 
     async def stats_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Get and display QR code statistics."""
-        # Get days parameter if provided (default: 30)
+        """Получает и отображает статистику QR-кодов."""
+        # Получаем параметр дней, если он указан (по умолчанию: 30)
         days = 30
         if context.args and context.args[0].isdigit():
             days = int(context.args[0])
 
-        # Get stats from API
+        # Получаем статистику из API
         api_url = f"{settings.SITE_URL}/api/location-stats/?days={days}"
         headers = {"Authorization": f"Token {settings.API_TOKEN}"}
 
@@ -134,66 +139,72 @@ class Command(BaseCommand):
             data = response.json()
 
             if not data:
-                await update.message.reply_text("No QR code scan data available yet.")
+                await update.message.reply_text(
+                    "Данные о сканированиях QR-кодов пока отсутствуют."
+                )
                 return
 
-            # Format message
-            message = "📊 QR Code Statistics (Last {} days)\n\n".format(days)
+            # Формируем сообщение
+            message = "📊 Статистика QR-кодов (Последние {} дней)\n\n".format(days)
 
             for location in data:
                 message += f"*{location['name']}*\n"
-                message += f"Total scans: {location['total_scans']}\n"
-                message += f"Recent scans ({days} days): {location['recent_scans']}\n\n"
+                message += f"Всего сканирований: {location['total_scans']}\n"
+                message += f"Недавние сканирования ({days} дней): {location['recent_scans']}\n\n"
 
             await update.message.reply_text(message, parse_mode="Markdown")
         except Exception as e:
             logger.error(f"Error fetching statistics: {str(e)}")
             await update.message.reply_text(
-                f"Error fetching statistics. Please try again later."
+                f"Ошибка при получении статистики. Пожалуйста, попробуйте позже."
             )
 
     async def all_stats_command(
         self, update: Update, context: ContextTypes.DEFAULT_TYPE
     ):
-        """Get and display statistics for all locations (admin only)"""
+        """Получает и отображает статистику по всем локациям (только для администраторов)"""
         user = update.effective_user
 
         if not self.is_admin(user.username):
             await update.message.reply_text(
-                "⛔ You don't have permission to use this command."
+                "⛔ У вас нет разрешения на использование этой команды."
             )
             return
 
-        # Get days parameter if provided (default: 30)
+        # Получаем параметр дней, если он указан (по умолчанию: 30)
         days = 30
         if context.args and context.args[0].isdigit():
             days = int(context.args[0])
 
-        # Calculate date ranges
+        # Рассчитываем диапазоны дат
         today = timezone.now().date()
         start_date = today - datetime.timedelta(days=days)
 
         try:
-            # Get all locations
+            # Получаем все локации
             locations = Location.objects.all()
 
             if not locations.exists():
-                await update.message.reply_text("No locations found in the database.")
+                await update.message.reply_text("В базе данных не найдено локаций.")
                 return
 
-            # Calculate total scans across all locations
+            # Рассчитываем общее количество сканирований по всем локациям
             total_scans = QRCodeScan.objects.count()
             recent_scans = QRCodeScan.objects.filter(
                 timestamp__date__gte=start_date
             ).count()
 
-            # Format message
-            message = f"📊 *QR Code Statistics - All Locations (Last {days} days)*\n\n"
-            message += f"*Total Scans Across All Locations: {total_scans}*\n"
-            message += f"*Recent Scans (Last {days} days): {recent_scans}*\n\n"
-            message += "*Breakdown by Location:*\n\n"
+            # Формируем сообщение
+            message = (
+                f"📊 *Статистика QR-кодов - Все локации (Последние {days} дней)*\n\n"
+            )
+            message += f"*Всего сканирований по всем локациям: {total_scans}*\n"
+            message += (
+                f"*Недавние сканирования (Последние {days} дней): {recent_scans}*\n\n"
+            )
+            message += "*Разбивка по локациям:*\n\n"
 
-            # Add stats for each location
+            # Добавляем статистику для каждой локации
             for location in locations:
                 location_total = location.scans.count()
                 location_recent = location.scans.filter(
@@ -201,13 +212,13 @@ class Command(BaseCommand):
                 ).count()
 
                 message += f"*{location.name}*\n"
-                message += f"Total scans: {location_total}\n"
-                message += f"Recent scans ({days} days): {location_recent}\n"
+                message += f"Всего сканирований: {location_total}\n"
+                message += f"Недавние сканирования ({days} дней): {location_recent}\n"
 
-                # Calculate percentage of total scans
+                # Рассчитываем процент от общего числа сканирований
                 if total_scans > 0:
                     percentage = (location_total / total_scans) * 100
-                    message += f"Percentage of total: {percentage:.1f}%\n"
+                    message += f"Процент от общего числа: {percentage:.1f}%\n"
 
                 message += "\n"
 
@@ -215,70 +226,70 @@ class Command(BaseCommand):
         except Exception as e:
             logger.error(f"Error fetching all statistics: {str(e)}")
             await update.message.reply_text(
-                f"Error fetching statistics. Please try again later."
+                f"Ошибка при получении статистики. Пожалуйста, попробуйте позже."
             )
 
     async def compare_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Compare statistics between locations (admin only)"""
+        """Сравнивает статистику между локациями (только для администраторов)"""
         user = update.effective_user
 
         if not self.is_admin(user.username):
             await update.message.reply_text(
-                "⛔ You don't have permission to use this command."
+                "⛔ У вас нет разрешения на использование этой команды."
             )
             return
 
         try:
-            # Get all locations
+            # Получаем все локации
             locations = Location.objects.all()
 
             if not locations.exists() or locations.count() < 2:
                 await update.message.reply_text(
-                    "Need at least two locations to compare."
+                    "Необходимо минимум две локации для сравнения."
                 )
                 return
 
-            # Calculate time periods
+            # Рассчитываем периоды времени
             today = timezone.now().date()
             yesterday = today - datetime.timedelta(days=1)
             last_week = today - datetime.timedelta(days=7)
             last_month = today - datetime.timedelta(days=30)
 
-            # Format message
-            message = "📊 *Location Comparison*\n\n"
+            # Формируем сообщение
+            message = "📊 *Сравнение локаций*\n\n"
 
-            # Today's scans
-            message += "*Today's Scans:*\n"
+            # Сканирования за сегодня
+            message += "*Сканирования за сегодня:*\n"
             for location in locations:
                 today_count = location.scans.filter(timestamp__date=today).count()
                 message += f"{location.name}: {today_count}\n"
 
-            # Yesterday's scans
-            message += "\n*Yesterday's Scans:*\n"
+            # Сканирования за вчера
+            message += "\n*Сканирования за вчера:*\n"
             for location in locations:
                 yesterday_count = location.scans.filter(
                     timestamp__date=yesterday
                 ).count()
                 message += f"{location.name}: {yesterday_count}\n"
 
-            # Last 7 days
-            message += "\n*Last 7 Days:*\n"
+            # Последние 7 дней
+            message += "\n*Последние 7 дней:*\n"
             for location in locations:
                 week_count = location.scans.filter(
                     timestamp__date__gte=last_week
                 ).count()
                 message += f"{location.name}: {week_count}\n"
 
-            # Last 30 days
-            message += "\n*Last 30 Days:*\n"
+            # Последние 30 дней
+            message += "\n*Последние 30 дней:*\n"
             for location in locations:
                 month_count = location.scans.filter(
                     timestamp__date__gte=last_month
                 ).count()
                 message += f"{location.name}: {month_count}\n"
 
-            # All time
-            message += "\n*All Time:*\n"
+            # Все время
+            message += "\n*Все время:*\n"
             for location in locations:
                 total_count = location.scans.count()
                 message += f"{location.name}: {total_count}\n"
@@ -287,40 +298,46 @@ class Command(BaseCommand):
         except Exception as e:
             logger.error(f"Error comparing locations: {str(e)}")
             await update.message.reply_text(
-                f"Error comparing locations. Please try again later."
+                f"Ошибка при сравнении локаций. Пожалуйста, попробуйте позже."
             )
 
     async def dashboard_command(
         self, update: Update, context: ContextTypes.DEFAULT_TYPE
     ):
-        """Display an interactive dashboard with buttons (admin only)"""
+        """Отображает интерактивную панель с кнопками (только для администраторов)"""
         user = update.effective_user
 
         if not self.is_admin(user.username):
             await update.message.reply_text(
-                "⛔ You don't have permission to use this command."
+                "⛔ У вас нет разрешения на использование этой команды."
             )
             return
 
         try:
-            # Create inline keyboard with options
+            # Создаем встроенную клавиатуру с опциями
             keyboard = [
                 [
-                    InlineKeyboardButton("Today's Stats", callback_data="stats_today"),
                     InlineKeyboardButton(
-                        "Yesterday's Stats", callback_data="stats_yesterday"
+                        "Статистика за сегодня", callback_data="stats_today"
+                    ),
+                    InlineKeyboardButton(
+                        "Статистика за вчера", callback_data="stats_yesterday"
                     ),
                 ],
                 [
-                    InlineKeyboardButton("Last 7 Days", callback_data="stats_7days"),
-                    InlineKeyboardButton("Last 30 Days", callback_data="stats_30days"),
+                    InlineKeyboardButton(
+                        "Последние 7 дней", callback_data="stats_7days"
+                    ),
+                    InlineKeyboardButton(
+                        "Последние 30 дней", callback_data="stats_30days"
+                    ),
                 ],
                 [
                     InlineKeyboardButton(
-                        "All Time Stats", callback_data="stats_alltime"
+                        "Статистика за все время", callback_data="stats_alltime"
                     ),
                     InlineKeyboardButton(
-                        "Compare Locations", callback_data="compare_locations"
+                        "Сравнить локации", callback_data="compare_locations"
                     ),
                 ],
             ]
@@ -328,26 +345,26 @@ class Command(BaseCommand):
             reply_markup = InlineKeyboardMarkup(keyboard)
 
             await update.message.reply_text(
-                "📊 *QR Code Statistics Dashboard*\n\n"
-                "Select an option to view statistics:",
+                "📊 *Панель статистики QR-кодов*\n\n"
+                "Выберите опцию для просмотра статистики:",
                 reply_markup=reply_markup,
                 parse_mode="Markdown",
             )
         except Exception as e:
             logger.error(f"Error displaying dashboard: {str(e)}")
             await update.message.reply_text(
-                f"Error displaying dashboard. Please try again later."
+                f"Ошибка при отображении панели. Пожалуйста, попробуйте позже."
             )
 
     async def button_callback(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Handle button callbacks from the dashboard"""
+        """Обрабатывает обратные вызовы кнопок с панели"""
         query = update.callback_query
         await query.answer()
 
         user = update.effective_user
         if not self.is_admin(user.username):
             await query.edit_message_text(
-                "⛔ You don't have permission to use this feature."
+                "⛔ У вас нет разрешения на использование этой функции."
             )
             return
 
@@ -355,23 +372,23 @@ class Command(BaseCommand):
 
         try:
             if callback_data == "stats_today":
-                # Get today's stats
+                # Получаем статистику за сегодня
                 today = timezone.now().date()
                 locations = Location.objects.all()
 
-                message = "\ud83d\udcca *Today's Statistics*\n\n"
+                message = "\ud83d\udcca *Статистика за сегодня*\n\n"
                 total_today = QRCodeScan.objects.filter(timestamp__date=today).count()
-                message += f"*Total Scans Today: {total_today}*\n\n"
+                message += f"*Всего сканирований сегодня: {total_today}*\n\n"
 
                 for location in locations:
                     today_count = location.scans.filter(timestamp__date=today).count()
-                    message += f"*{location.name}*: {today_count} scans\n"
+                    message += f"*{location.name}*: {today_count} сканирований\n"
 
-                # Add back button
+                # Добавляем кнопку возврата
                 keyboard = [
                     [
                         InlineKeyboardButton(
-                            "Back to Dashboard", callback_data="back_to_dashboard"
+                            "Вернуться к панели", callback_data="back_to_dashboard"
                         )
                     ]
                 ]
@@ -382,28 +399,28 @@ class Command(BaseCommand):
                 )
 
             elif callback_data == "stats_yesterday":
-                # Get yesterday's stats
+                # Получаем статистику за вчера
                 today = timezone.now().date()
                 yesterday = today - datetime.timedelta(days=1)
                 locations = Location.objects.all()
 
-                message = "\ud83d\udcca *Yesterday's Statistics*\n\n"
+                message = "\ud83d\udcca *Статистика за вчера*\n\n"
                 total_yesterday = QRCodeScan.objects.filter(
                     timestamp__date=yesterday
                 ).count()
-                message += f"*Total Scans Yesterday: {total_yesterday}*\n\n"
+                message += f"*Всего сканирований вчера: {total_yesterday}*\n\n"
 
                 for location in locations:
                     yesterday_count = location.scans.filter(
                         timestamp__date=yesterday
                     ).count()
-                    message += f"*{location.name}*: {yesterday_count} scans\n"
+                    message += f"*{location.name}*: {yesterday_count} сканирований\n"
 
-                # Add back button
+                # Добавляем кнопку возврата
                 keyboard = [
                     [
                         InlineKeyboardButton(
-                            "Back to Dashboard", callback_data="back_to_dashboard"
+                            "Вернуться к панели", callback_data="back_to_dashboard"
                         )
                     ]
                 ]
@@ -414,28 +431,28 @@ class Command(BaseCommand):
                 )
 
             elif callback_data == "stats_7days":
-                # Get last 7 days stats
+                # Получаем статистику за последние 7 дней
                 today = timezone.now().date()
                 last_week = today - datetime.timedelta(days=7)
                 locations = Location.objects.all()
 
-                message = "\ud83d\udcca *Last 7 Days Statistics*\n\n"
+                message = "\ud83d\udcca *Статистика за последние 7 дней*\n\n"
                 total_week = QRCodeScan.objects.filter(
                     timestamp__date__gte=last_week
                 ).count()
-                message += f"*Total Scans (Last 7 Days): {total_week}*\n\n"
+                message += f"*Всего сканирований (последние 7 дней): {total_week}*\n\n"
 
                 for location in locations:
                     week_count = location.scans.filter(
                         timestamp__date__gte=last_week
                     ).count()
-                    message += f"*{location.name}*: {week_count} scans\n"
+                    message += f"*{location.name}*: {week_count} сканирований\n"
 
-                # Add back button
+                # Добавляем кнопку возврата
                 keyboard = [
                     [
                         InlineKeyboardButton(
-                            "Back to Dashboard", callback_data="back_to_dashboard"
+                            "Вернуться к панели", callback_data="back_to_dashboard"
                         )
                     ]
                 ]
@@ -446,28 +463,30 @@ class Command(BaseCommand):
                 )
 
             elif callback_data == "stats_30days":
-                # Get last 30 days stats
+                # Получаем статистику за последние 30 дней
                 today = timezone.now().date()
                 last_month = today - datetime.timedelta(days=30)
                 locations = Location.objects.all()
 
-                message = "\ud83d\udcca *Last 30 Days Statistics*\n\n"
+                message = "\ud83d\udcca *Статистика за последние 30 дней*\n\n"
                 total_month = QRCodeScan.objects.filter(
                     timestamp__date__gte=last_month
                 ).count()
-                message += f"*Total Scans (Last 30 Days): {total_month}*\n\n"
+                message += (
+                    f"*Всего сканирований (последние 30 дней): {total_month}*\n\n"
+                )
 
                 for location in locations:
                     month_count = location.scans.filter(
                         timestamp__date__gte=last_month
                     ).count()
-                    message += f"*{location.name}*: {month_count} scans\n"
+                    message += f"*{location.name}*: {month_count} сканирований\n"
 
-                # Add back button
+                # Добавляем кнопку возврата
                 keyboard = [
                     [
                         InlineKeyboardButton(
-                            "Back to Dashboard", callback_data="back_to_dashboard"
+                            "Вернуться к панели", callback_data="back_to_dashboard"
                         )
                     ]
                 ]
@@ -478,27 +497,25 @@ class Command(BaseCommand):
                 )
 
             elif callback_data == "stats_alltime":
-                # Get all-time stats
+                # Получаем статистику за все время
                 locations = Location.objects.all()
 
-                message = "\ud83d\udcca *All-Time Statistics*\n\n"
+                message = "\ud83d\udcca *Статистика за все время*\n\n"
                 total_all = QRCodeScan.objects.count()
-                message += f"*Total Scans (All Time): {total_all}*\n\n"
+                message += f"*Всего сканирований (за все время): {total_all}*\n\n"
 
                 for location in locations:
                     all_count = location.scans.count()
                     percentage = 0
                     if total_all > 0:
                         percentage = (all_count / total_all) * 100
-                    message += (
-                        f"*{location.name}*: {all_count} scans ({percentage:.1f}%)\n"
-                    )
+                    message += f"*{location.name}*: {all_count} сканирований ({percentage:.1f}%)\n"
 
-                # Add back button
+                # Добавляем кнопку возврата
                 keyboard = [
                     [
                         InlineKeyboardButton(
-                            "Back to Dashboard", callback_data="back_to_dashboard"
+                            "Вернуться к панели", callback_data="back_to_dashboard"
                         )
                     ]
                 ]
@@ -509,65 +526,65 @@ class Command(BaseCommand):
                 )
 
             elif callback_data == "compare_locations":
-                # Compare locations
+                # Сравниваем локации
                 locations = Location.objects.all()
 
                 if not locations.exists() or locations.count() < 2:
                     await query.edit_message_text(
-                        "Need at least two locations to compare."
+                        "Необходимо минимум две локации для сравнения."
                     )
                     return
 
-                # Calculate time periods
+                # Рассчитываем периоды времени
                 today = timezone.now().date()
                 yesterday = today - datetime.timedelta(days=1)
                 last_week = today - datetime.timedelta(days=7)
                 last_month = today - datetime.timedelta(days=30)
 
-                # Format message
-                message = "📊 *Location Comparison*\n\n"
+                # Формируем сообщение
+                message = "📊 *Сравнение локаций*\n\n"
 
-                # Today's scans
-                message += "*Today's Scans:*\n"
+                # Сканирования за сегодня
+                message += "*Сканирования за сегодня:*\n"
                 for location in locations:
                     today_count = location.scans.filter(timestamp__date=today).count()
                     message += f"{location.name}: {today_count}\n"
 
-                # Yesterday's scans
-                message += "\n*Yesterday's Scans:*\n"
+                # Сканирования за вчера
+                message += "\n*Сканирования за вчера:*\n"
                 for location in locations:
                     yesterday_count = location.scans.filter(
                         timestamp__date=yesterday
                     ).count()
                     message += f"{location.name}: {yesterday_count}\n"
 
-                # Last 7 days
-                message += "\n*Last 7 Days:*\n"
+                # Последние 7 дней
+                message += "\n*Последние 7 дней:*\n"
                 for location in locations:
                     week_count = location.scans.filter(
                         timestamp__date__gte=last_week
                     ).count()
                     message += f"{location.name}: {week_count}\n"
 
-                # Last 30 days
-                message += "\n*Last 30 Days:*\n"
+                # Последние 30 дней
+                message += "\n*Последние 30 дней:*\n"
                 for location in locations:
                     month_count = location.scans.filter(
                         timestamp__date__gte=last_month
                     ).count()
                     message += f"{location.name}: {month_count}\n"
 
-                # All time
-                message += "\n*All Time:*\n"
+                # Все время
+                message += "\n*Все время:*\n"
                 for location in locations:
                     total_count = location.scans.count()
                     message += f"{location.name}: {total_count}\n"
 
-                # Add back button
+                # Добавляем кнопку возврата
                 keyboard = [
                     [
                         InlineKeyboardButton(
-                            "Back to Dashboard", callback_data="back_to_dashboard"
+                            "Вернуться к панели", callback_data="back_to_dashboard"
                         )
                     ]
                 ]
@@ -578,30 +595,30 @@ class Command(BaseCommand):
                 )
 
             elif callback_data == "back_to_dashboard":
-                # Return to dashboard
+                # Возвращаемся к панели
                 keyboard = [
                     [
                         InlineKeyboardButton(
-                            "Today's Stats", callback_data="stats_today"
+                            "Статистика за сегодня", callback_data="stats_today"
                         ),
                         InlineKeyboardButton(
-                            "Yesterday's Stats", callback_data="stats_yesterday"
-                        ),
-                    ],
-                    [
-                        InlineKeyboardButton(
-                            "Last 7 Days", callback_data="stats_7days"
-                        ),
-                        InlineKeyboardButton(
-                            "Last 30 Days", callback_data="stats_30days"
+                            "Статистика за вчера", callback_data="stats_yesterday"
                         ),
                     ],
                     [
                         InlineKeyboardButton(
-                            "All Time Stats", callback_data="stats_alltime"
+                            "Последние 7 дней", callback_data="stats_7days"
                         ),
                         InlineKeyboardButton(
-                            "Compare Locations", callback_data="compare_locations"
+                            "Последние 30 дней", callback_data="stats_30days"
+                        ),
+                    ],
+                    [
+                        InlineKeyboardButton(
+                            "Статистика за все время", callback_data="stats_alltime"
+                        ),
+                        InlineKeyboardButton(
+                            "Сравнить локации", callback_data="compare_locations"
                         ),
                     ],
                 ]
@@ -609,8 +626,8 @@ class Command(BaseCommand):
                 reply_markup = InlineKeyboardMarkup(keyboard)
 
                 await query.edit_message_text(
-                    "📊 *QR Code Statistics Dashboard*\n\n"
-                    "Select an option to view statistics:",
+                    "📊 *Панель статистики QR-кодов*\n\n"
+                    "Выберите опцию для просмотра статистики:",
                     reply_markup=reply_markup,
                     parse_mode="Markdown",
                 )
@@ -618,5 +635,5 @@ class Command(BaseCommand):
         except Exception as e:
             logger.error(f"Error handling button callback: {str(e)}")
             await query.edit_message_text(
-                f"Error processing request. Please try again later."
+                f"Ошибка при обработке запроса. Пожалуйста, попробуйте позже."
             )
