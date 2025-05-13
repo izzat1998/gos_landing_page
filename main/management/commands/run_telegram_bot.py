@@ -111,11 +111,7 @@ class QRStatsBot:
             "/help — доступные команды"
         )
         if is_admin:
-            text += (
-                "\n\n🔐 *Admin*\n"
-                "/allstats [d] — статистика по всем локациям\n"
-                "/compare — сравнить локации"
-            )
+            text += "\n\n🔐 *Admin*\n/allstats [d] — статистика по всем локациям"
         await update.message.reply_text(text, parse_mode="Markdown")
 
     async def cmd_help(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
