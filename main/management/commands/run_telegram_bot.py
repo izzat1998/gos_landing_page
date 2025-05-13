@@ -23,6 +23,7 @@ import requests
 # Import models directly
 from asgiref.sync import sync_to_async
 from django.conf import settings
+from django.core.management.base import BaseCommand
 from django.utils import timezone
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import (
@@ -359,6 +360,15 @@ class QRStatsBot:
         logger.info("Bot starting…")
         self.app.run_polling()
 
+
+class Command(BaseCommand):
+    help = "Run the Telegram QR statistics bot"
+    
+    def handle(self, *args, **options):
+        self.stdout.write(self.style.SUCCESS("Starting Telegram bot..."))
+        bot = QRStatsBot()
+        bot.run()
+        
 
 if __name__ == "__main__":
     QRStatsBot().run()
