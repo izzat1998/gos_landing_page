@@ -134,8 +134,41 @@ class Command(BaseCommand):
         api_url = f"{settings.SITE_URL}/api/location-stats/?days={days}"
         headers = {"Authorization": f"Token {settings.API_TOKEN}"}
 
+        # Выводим отладочную информацию
+        logger.info(f"Attempting to connect to API at: {api_url}")
+        logger.info(f"Using API token: {settings.API_TOKEN[:5]}...")
+
         try:
-            response = requests.get(api_url, headers=headers)
+            # Проверяем настройки
+            if not settings.SITE_URL or settings.SITE_URL == "http://localhost:8000":
+                logger.error(
+                    f"SITE_URL is not properly configured: {settings.SITE_URL}"
+                )
+                await update.message.reply_text(
+                    "Ошибка конфигурации: SITE_URL не настроен правильно. Обратитесь к администратору."
+                )
+                return
+
+            if not settings.API_TOKEN or settings.API_TOKEN == "your_api_token_here":
+                logger.error("API_TOKEN is not properly configured")
+                await update.message.reply_text(
+                    "Ошибка конфигурации: API_TOKEN не настроен. Запустите 'python manage.py create_api_token admin' и обновите .env файл."
+                )
+                return
+
+            # Пробуем получить данные
+            response = requests.get(api_url, headers=headers, timeout=10)
+
+            # Проверяем статус ответа
+            if response.status_code != 200:
+                logger.error(
+                    f"API returned status code: {response.status_code}, Response: {response.text}"
+                )
+                await update.message.reply_text(
+                    f"Ошибка API: Статус {response.status_code}. Убедитесь, что сервер запущен и API доступен."
+                )
+                return
+
             data = response.json()
 
             if not data:
@@ -153,10 +186,20 @@ class Command(BaseCommand):
                 message += f"Недавние сканирования ({days} дней): {location['recent_scans']}\n\n"
 
             await update.message.reply_text(message, parse_mode="Markdown")
+        except requests.exceptions.ConnectionError as e:
+            logger.error(f"Connection error: {str(e)}")
+            await update.message.reply_text(
+                "Ошибка подключения к API. Убедитесь, что сервер Django запущен и доступен."
+            )
+        except requests.exceptions.Timeout as e:
+            logger.error(f"Timeout error: {str(e)}")
+            await update.message.reply_text(
+                "Превышено время ожидания ответа от API. Сервер может быть перегружен."
+            )
         except Exception as e:
             logger.error(f"Error fetching statistics: {str(e)}")
             await update.message.reply_text(
-                f"Ошибка при получении статистики. Пожалуйста, попробуйте позже."
+                f"Ошибка при получении статистики: {str(e)}. Пожалуйста, попробуйте позже."
             )
 
     async def all_stats_command(
