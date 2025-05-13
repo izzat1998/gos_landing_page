@@ -94,7 +94,7 @@ class QRStatsBot:
         self.app.add_handler(CommandHandler("help", self.cmd_help))
         self.app.add_handler(CommandHandler("stats", self.cmd_stats))
         self.app.add_handler(CommandHandler("allstats", self.cmd_allstats))
-        self.app.add_handler(CommandHandler("compare", self.cmd_compare))
+
         # callback queries
         self.app.add_handler(CallbackQueryHandler(self.cb_handler))
         # global error handler
@@ -135,10 +135,6 @@ class QRStatsBot:
         await self._send_stats(update, days, admin_scope=True)
 
     @admin_only
-    async def cmd_compare(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        await self._send_compare(update)
-
-    @admin_only
     async def cmd_dashboard(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         kb = self._build_dashboard_kb()
         await update.message.reply_text(
@@ -158,8 +154,6 @@ class QRStatsBot:
             await self._send_stats(
                 update, self._range_to_days(arg[0]), admin_scope=True, edit=True
             )
-        elif action == "compare":
-            await self._send_compare(update, edit=True)
         elif action == "back":
             await self.cmd_dashboard(update, context)
         await query.answer()
@@ -291,51 +285,6 @@ class QRStatsBot:
             logger.error(traceback.format_exc())
             await update.effective_message.reply_text(
                 "Ошибка при получении статистики. Пожалуйста, попробуйте позже."
-            )
-
-    async def _send_compare(self, update: Update, *, edit: bool = False):
-        try:
-            today = timezone.now().date()
-
-            # Wrap DB operations with sync_to_async
-            get_locations = sync_to_async(self._get_locations)
-            count_for_date = sync_to_async(self._count_location_scans_for_date)
-            count_location_scans = sync_to_async(self._count_location_scans)
-
-            # Get locations asynchronously
-            locations = await get_locations()
-
-            # Start building the message
-            sections = ["📊 *Сравнение локаций*\n"]
-
-            # Process each time period
-            for label, delta in (
-                ("Сегодня", 0),
-                ("Вчера", 1),
-                ("7 дней", 7),
-                ("30 дней", 30),
-            ):
-                target_date = today - _dt.timedelta(days=delta if delta > 0 else 0)
-                sections.append(f"*{label}*:")
-
-                for loc in locations:
-                    if delta == 0 or delta == 1:
-                        # For today/yesterday, get exact date count
-                        cnt = await count_for_date(loc.id, target_date)
-                    else:
-                        # For ranges, get counts since start date
-                        cnt = await count_location_scans(loc.id, target_date)
-
-                    sections.append(f"{loc.name}: {cnt}")
-                sections.append("")
-
-            # Join all parts and send
-            await self._reply(update, "\n".join(sections), edit=edit)
-        except Exception as e:
-            logger.error(f"Error in _send_compare: {str(e)}")
-            logger.error(traceback.format_exc())
-            await update.effective_message.reply_text(
-                "Ошибка при сравнении локаций. Пожалуйста, попробуйте позже."
             )
 
     @staticmethod
