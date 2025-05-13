@@ -21,7 +21,7 @@ User = get_user_model()
 logger = logging.getLogger(__name__)
 
 # List of admin usernames who can access admin commands
-ADMIN_USERNAMES = ["admin", "superuser"]  # Add your admin Telegram usernames here
+ADMIN_USERNAMES = ["Iforce706", "subanovsh"]  # Add your admin Telegram usernames here
 
 
 class Command(BaseCommand):
