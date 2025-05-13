@@ -1,8 +1,12 @@
-"""Django management command: run Telegram bot for QR‑code statistics.
+"""TeleGram QR statistics bot — refactored & condensed version.
 
-Place this file inside an application folder, e.g. `main/management/commands/run_qr_stats_bot.py`.
-Run with:
-    python manage.py run_qr_stats_bot
+Key changes
+-----------
+* Single `QRStatsBot` class encapsulating configuration, handlers and helpers.
+* DRY helpers for date‑range calculation, message formatting and keyboard creation.
+* Callback queries use a structured payload (`<action>:<arg>`), reducing `if/elif` blocks.
+* Centralised admin‑check decorator.
+* Extensive type hints + docstrings.
 """
 
 from __future__ import annotations
@@ -12,10 +16,13 @@ import logging
 import traceback
 from enum import Enum
 from functools import wraps
-from typing import Callable, Iterable
+from typing import Callable, List, Optional
 
+import requests
+
+# Import models directly
+from asgiref.sync import sync_to_async
 from django.conf import settings
-from django.core.management.base import BaseCommand
 from django.utils import timezone
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import (
@@ -29,10 +36,6 @@ from main.models import Location, QRCodeScan  # pylint: disable=import-error
 
 logger = logging.getLogger(__name__)
 
-# ────────────────────────────────────────────────────────────────────────────────
-#  Configuration
-# ────────────────────────────────────────────────────────────────────────────────
-
 ADMIN_USERNAMES: set[str] = {"Iforce706", "subanovsh"}
 
 
@@ -44,27 +47,20 @@ class Range(str, Enum):
     ALL = "all"
 
     @classmethod
-    def to_days(cls, label: str) -> int:
-        mapping = {
-            cls.TODAY.value: 0,
-            cls.YESTERDAY.value: 1,
-            cls.WEEK.value: 7,
-            cls.MONTH.value: 30,
-            cls.ALL.value: 10 * 365,  # proxy for “all time”
-        }
-        return mapping.get(label, 30)
+    def list(cls) -> list[str]:
+        return [m.value for m in cls]  # type: ignore[arg-type]
 
 
 # ────────────────────────────────────────────────────────────────────────────────
-#  Decorators
+#  Utilities
 # ────────────────────────────────────────────────────────────────────────────────
 
 
 def admin_only(func: Callable):  # type: ignore[override]
-    """Block access to a handler for non‑admin users."""
+    """Decorator blocking non‑admin users."""
 
     @wraps(func)
-    async def _wrapped(
+    async def _wrapper(
         self: "QRStatsBot", update: Update, context: ContextTypes.DEFAULT_TYPE
     ):  # noqa: D401,E501
         user = update.effective_user
@@ -73,24 +69,24 @@ def admin_only(func: Callable):  # type: ignore[override]
             return
         return await func(self, update, context)
 
-    return _wrapped
+    return _wrapper
 
 
 # ────────────────────────────────────────────────────────────────────────────────
-#  Core bot class
+#  Core bot
 # ────────────────────────────────────────────────────────────────────────────────
 
 
 class QRStatsBot:
-    """Encapsulated Telegram bot logic."""
-
-    TOKEN = settings.TELEGRAM_BOT_TOKEN
+    """Encapsulated bot instance."""
 
     def __init__(self) -> None:
-        self.app = ApplicationBuilder().token(self.TOKEN).build()
+        self.site_url = settings.SITE_URL.rstrip("/")
+        self.api_token = settings.API_TOKEN
+        self.app = ApplicationBuilder().token(settings.TELEGRAM_BOT_TOKEN).build()
         self._register_handlers()
 
-    # ─── Handler registration ────────────────────────────────────────────────
+    # ─── Handlers registration ────────────────────────────────────────────────
 
     def _register_handlers(self) -> None:
         self.app.add_handler(CommandHandler("start", self.cmd_start))
@@ -99,27 +95,29 @@ class QRStatsBot:
         self.app.add_handler(CommandHandler("allstats", self.cmd_allstats))
         self.app.add_handler(CommandHandler("compare", self.cmd_compare))
         self.app.add_handler(CommandHandler("dashboard", self.cmd_dashboard))
+        # callback queries
         self.app.add_handler(CallbackQueryHandler(self.cb_handler))
+        # global error handler
         self.app.add_error_handler(self.error_handler)
 
-    # ─── Command handlers ────────────────────────────────────────────────────
+    # ─── Commands ─────────────────────────────────────────────────────────────
 
     async def cmd_start(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         user = update.effective_user
         is_admin = user and user.username in ADMIN_USERNAMES
-        msg = (
+        text = (
             "👋 Добро пожаловать!\n\n"
-            "/stats [d] — статистика (d дней, 30 по умолчанию)\n"
-            "/help — список команд"
+            "/stats [d] — статистика по вашей локации (d дней, 30 по умол.)\n"
+            "/help — доступные команды"
         )
         if is_admin:
-            msg += (
+            text += (
                 "\n\n🔐 *Admin*\n"
-                "/allstats [d] — по всем локациям\n"
+                "/allstats [d] — статистика по всем локациям\n"
                 "/compare — сравнить локации\n"
                 "/dashboard — интерактивная панель"
             )
-        await update.message.reply_text(msg, parse_mode="Markdown")
+        await update.message.reply_text(text, parse_mode="Markdown")
 
     async def cmd_help(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         await self.cmd_start(update, context)
@@ -143,30 +141,80 @@ class QRStatsBot:
 
     @admin_only
     async def cmd_dashboard(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        kb = self._dashboard_keyboard()
+        kb = self._build_dashboard_kb()
         await update.message.reply_text(
             "📊 *Панель статистики* — выберите диапазон:",
             reply_markup=InlineKeyboardMarkup(kb),
             parse_mode="Markdown",
         )
 
-    # ─── Callback queries ────────────────────────────────────────────────────
+    # ─── Callback queries ─────────────────────────────────────────────────────
 
     async def cb_handler(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         query = update.callback_query
         if not query or not query.data:
             return
-        cmd, *arg = query.data.split(":")
-        if cmd == "range":
-            days = Range.to_days(arg[0])
-            await self._send_stats(update, days, admin_scope=True, edit=True)
-        elif cmd == "compare":
+        action, *arg = query.data.split(":")
+        if action == "range":
+            await self._send_stats(
+                update, self._range_to_days(arg[0]), admin_scope=True, edit=True
+            )
+        elif action == "compare":
             await self._send_compare(update, edit=True)
-        elif cmd == "back":
+        elif action == "back":
             await self.cmd_dashboard(update, context)
         await query.answer()
 
-    # ─── Internal helpers ────────────────────────────────────────────────────
+    # ─── Shared helpers ───────────────────────────────────────────────────────
+
+    # Database helper functions that will be wrapped with sync_to_async
+    def _get_locations(self) -> List[Location]:
+        """Get all locations from database."""
+        try:
+            return list(Location.objects.all())
+        except Exception as e:
+            logger.error(f"Error in _get_locations: {str(e)}")
+            return []
+
+    def _count_scans(self, start_date=None) -> int:
+        """Count all scans, optionally filtered by date."""
+        try:
+            qs = QRCodeScan.objects
+            if start_date:
+                qs = qs.filter(timestamp__date__gte=start_date)
+            return qs.count()
+        except Exception as e:
+            logger.error(f"Error in _count_scans: {str(e)}")
+            return 0
+
+    def _count_location_scans(self, location_id: int, start_date=None) -> int:
+        """Count scans for a specific location."""
+        try:
+            qs = QRCodeScan.objects.filter(location_id=location_id)
+            if start_date:
+                qs = qs.filter(timestamp__date__gte=start_date)
+            return qs.count()
+        except Exception as e:
+            logger.error(f"Error in _count_location_scans: {str(e)}")
+            return 0
+
+    def _count_scans_for_date(self, date) -> int:
+        """Count scans for a specific date."""
+        try:
+            return QRCodeScan.objects.filter(timestamp__date=date).count()
+        except Exception as e:
+            logger.error(f"Error in _count_scans_for_date: {str(e)}")
+            return 0
+
+    def _count_location_scans_for_date(self, location_id: int, date) -> int:
+        """Count scans for a specific location on a specific date."""
+        try:
+            return QRCodeScan.objects.filter(
+                location_id=location_id, timestamp__date=date
+            ).count()
+        except Exception as e:
+            logger.error(f"Error in _count_location_scans_for_date: {str(e)}")
+            return 0
 
     async def _send_stats(
         self,
@@ -176,52 +224,113 @@ class QRStatsBot:
         admin_scope: bool,
         edit: bool = False,
     ) -> None:
-        start = timezone.now().date() - _dt.timedelta(days=days)
-        total = QRCodeScan.objects.filter(timestamp__date__gte=start).count()
-        lines: list[str] = [
-            f"📊 *Статистика за {days} дней*",
-            f"Всего сканирований: {total}",
-        ]
-        if admin_scope:
-            for loc in Location.objects.all():
-                cnt = loc.scans.filter(timestamp__date__gte=start).count()
-                pct = (cnt / total * 100) if total else 0
-                lines.append(f"*{loc.name}*: {cnt}  ({pct:.1f}% )")
-        await self._reply(update, "\n".join(lines), edit=edit)
+        """Fetches statistics and sends/edits message."""
+        try:
+            # Calculate date range
+            start = timezone.now().date() - _dt.timedelta(days=days)
+
+            # Get data using sync_to_async
+            get_locations = sync_to_async(self._get_locations)
+            count_scans = sync_to_async(self._count_scans)
+            count_location_scans = sync_to_async(self._count_location_scans)
+
+            # Fetch data asynchronously
+            total_scans = await count_scans(start)
+
+            # Start building the message
+            parts: list[str] = [
+                f"📊 *Статистика за {days} дней*\n",
+                f"Всего сканирований: {total_scans}\n",
+            ]
+
+            # Add location stats if admin
+            if admin_scope:
+                locations = await get_locations()
+                for loc in locations:
+                    loc_scans = await count_location_scans(loc.id, start)
+                    # Ensure we don't divide by zero
+                    share = (loc_scans / total_scans * 100) if total_scans > 0 else 0
+                    parts.append(f"*{loc.name}*: {loc_scans} ({share:.1f}%)")
+
+            # Join all parts and send
+            msg = "\n".join(parts)
+            await self._reply(update, msg, edit=edit)
+        except Exception as e:
+            logger.error(f"Error in _send_stats: {str(e)}")
+            logger.error(traceback.format_exc())
+            await update.effective_message.reply_text(
+                "Ошибка при получении статистики. Пожалуйста, попробуйте позже."
+            )
 
     async def _send_compare(self, update: Update, *, edit: bool = False):
-        today = timezone.now().date()
-        locs = Location.objects.all()
-        sections: list[str] = ["📊 *Сравнение локаций*\n"]
-        for label, delta in (
-            ("Сегодня", 0),
-            ("Вчера", 1),
-            ("7 дней", 7),
-            ("30 дней", 30),
-        ):
-            start = today - _dt.timedelta(days=delta)
-            sections.append(f"*{label}*:")
-            for loc in locs:
-                cnt = (
-                    loc.scans.filter(timestamp__date=today).count()
-                    if delta == 0
-                    else loc.scans.filter(timestamp__date__gte=start).count()
-                )
-                sections.append(f"{loc.name}: {cnt}")
-            sections.append("")
-        await self._reply(update, "\n".join(sections), edit=edit)
+        try:
+            today = timezone.now().date()
 
-    def _dashboard_keyboard(self) -> list[list[InlineKeyboardButton]]:
-        btns = [
+            # Wrap DB operations with sync_to_async
+            get_locations = sync_to_async(self._get_locations)
+            count_for_date = sync_to_async(self._count_location_scans_for_date)
+            count_location_scans = sync_to_async(self._count_location_scans)
+
+            # Get locations asynchronously
+            locations = await get_locations()
+
+            # Start building the message
+            sections = ["📊 *Сравнение локаций*\n"]
+
+            # Process each time period
+            for label, delta in (
+                ("Сегодня", 0),
+                ("Вчера", 1),
+                ("7 дней", 7),
+                ("30 дней", 30),
+            ):
+                target_date = today - _dt.timedelta(days=delta if delta > 0 else 0)
+                sections.append(f"*{label}*:")
+
+                for loc in locations:
+                    if delta == 0 or delta == 1:
+                        # For today/yesterday, get exact date count
+                        cnt = await count_for_date(loc.id, target_date)
+                    else:
+                        # For ranges, get counts since start date
+                        cnt = await count_location_scans(loc.id, target_date)
+
+                    sections.append(f"{loc.name}: {cnt}")
+                sections.append("")
+
+            # Join all parts and send
+            await self._reply(update, "\n".join(sections), edit=edit)
+        except Exception as e:
+            logger.error(f"Error in _send_compare: {str(e)}")
+            logger.error(traceback.format_exc())
+            await update.effective_message.reply_text(
+                "Ошибка при сравнении локаций. Пожалуйста, попробуйте позже."
+            )
+
+    @staticmethod
+    def _range_to_days(r: str) -> int:
+        mapping = {
+            Range.TODAY.value: 0,
+            Range.YESTERDAY.value: 1,
+            Range.WEEK.value: 7,
+            Range.MONTH.value: 30,
+            Range.ALL.value: 3650,  # ~10 years as proxy for "all time"
+        }
+        return mapping.get(r, 30)
+
+    def _build_dashboard_kb(self) -> list[list[InlineKeyboardButton]]:
+        buttons = [
             ("Сегодня", Range.TODAY),
             ("Вчера", Range.YESTERDAY),
             ("7 дней", Range.WEEK),
             ("30 дней", Range.MONTH),
             ("Все время", Range.ALL),
         ]
-        rows = [
-            [InlineKeyboardButton(t, callback_data=f"range:{r.value}")] for t, r in btns
-        ]
+        rows: list[list[InlineKeyboardButton]] = []
+        for text, rng in buttons:
+            rows.append(
+                [InlineKeyboardButton(text, callback_data=f"range:{rng.value}")]
+            )
         rows.append(
             [InlineKeyboardButton("Сравнить локации", callback_data="compare:")]
         )
@@ -233,10 +342,10 @@ class QRStatsBot:
         else:
             await update.effective_message.reply_text(text, parse_mode="Markdown")
 
-    # ─── Global error handler ────────────────────────────────────────────────
+    # ─── Error handler ────────────────────────────────────────────────────────
 
     async def error_handler(self, update: object, context: ContextTypes.DEFAULT_TYPE):  # noqa: D401,E501
-        logger.error("Exception caught:")
+        logger.error("Exception while handling an update:")
         logger.error(context.error)
         logger.error("\n" + traceback.format_exc())
         if isinstance(update, Update) and update.effective_message:
@@ -244,20 +353,12 @@ class QRStatsBot:
                 "Произошла ошибка. Администратор уведомлен."
             )
 
-    # ─── Entrypoint ──────────────────────────────────────────────────────────
+    # ─── Entrypoint ───────────────────────────────────────────────────────────
 
     def run(self) -> None:
-        logger.info("QRStats bot starting…")
+        logger.info("Bot starting…")
         self.app.run_polling()
 
 
-# ────────────────────────────────────────────────────────────────────────────────
-#  Django management wrapper
-# ────────────────────────────────────────────────────────────────────────────────
-
-
-class Command(BaseCommand):
-    help = "Запускает Telegram‑бот для статистики QR‑кодов."
-
-    def handle(self, *args, **options):  # noqa: D401
-        QRStatsBot().run()
+if __name__ == "__main__":
+    QRStatsBot().run()
