@@ -37,7 +37,7 @@ from main.models import Location, QRCodeScan  # pylint: disable=import-error
 
 logger = logging.getLogger(__name__)
 
-ADMIN_USERNAMES: set[str] = {"Iforce706", "subanovsh"}
+ADMIN_USERNAMES: set[str] = {"Iforce706", "subanovsh", "umurzakova8686"}
 
 
 class Range(str, Enum):
