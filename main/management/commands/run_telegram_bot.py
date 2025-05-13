@@ -287,69 +287,177 @@ class Command(BaseCommand):
     ):
         """Получает и отображает статистику по всем локациям (только для администраторов)"""
         user = update.effective_user
+        logger.info(
+            f"all_stats_command called by user: {user.username} (ID: {user.id})"
+        )
 
+        # Check admin permissions
         if not self.is_admin(user.username):
+            logger.warning(
+                f"User {user.username} attempted to access admin command without permission"
+            )
             await update.message.reply_text(
                 "⛔ У вас нет разрешения на использование этой команды."
             )
             return
 
-        # Получаем параметр дней, если он указан (по умолчанию: 30)
+        # Get days parameter
         days = 30
-        if context.args and context.args[0].isdigit():
-            days = int(context.args[0])
+        try:
+            if context.args and context.args[0].isdigit():
+                days = int(context.args[0])
+                logger.info(f"Using custom days parameter: {days}")
+        except Exception as e:
+            logger.error(f"Error parsing days parameter: {str(e)}")
+            # Continue with default value
 
-        # Рассчитываем диапазоны дат
-        today = timezone.now().date()
-        start_date = today - datetime.timedelta(days=days)
+        # Calculate date ranges
+        try:
+            today = timezone.now().date()
+            start_date = today - datetime.timedelta(days=days)
+            logger.info(f"Date range: {start_date} to {today}")
+        except Exception as e:
+            logger.error(f"Error calculating date range: {str(e)}")
+            await update.message.reply_text(
+                "Ошибка при расчете диапазона дат. Пожалуйста, попробуйте позже."
+            )
+            return
+
+        # Send typing action to show the bot is processing
+        await update.message.chat.send_action(action="typing")
 
         try:
-            # Получаем все локации
-            locations = Location.objects.all()
+            # Get all locations
+            try:
+                locations = Location.objects.all()
+                locations_count = locations.count()
+                logger.info(f"Found {locations_count} locations")
 
-            if not locations.exists():
-                await update.message.reply_text("В базе данных не найдено локаций.")
+                if not locations.exists():
+                    logger.warning("No locations found in database")
+                    await update.message.reply_text("В базе данных не найдено локаций.")
+                    return
+            except Exception as db_err:
+                logger.error(f"Database error fetching locations: {str(db_err)}")
+                logger.error(traceback.format_exc())
+                await update.message.reply_text(
+                    "Ошибка при получении данных о локациях. Пожалуйста, попробуйте позже."
+                )
                 return
 
-            # Рассчитываем общее количество сканирований по всем локациям
-            total_scans = QRCodeScan.objects.count()
-            recent_scans = QRCodeScan.objects.filter(
-                timestamp__date__gte=start_date
-            ).count()
-
-            # Формируем сообщение
-            message = (
-                f"📊 *Статистика QR-кодов - Все локации (Последние {days} дней)*\n\n"
-            )
-            message += f"*Всего сканирований по всем локациям: {total_scans}*\n"
-            message += (
-                f"*Недавние сканирования (Последние {days} дней): {recent_scans}*\n\n"
-            )
-            message += "*Разбивка по локациям:*\n\n"
-
-            # Добавляем статистику для каждой локации
-            for location in locations:
-                location_total = location.scans.count()
-                location_recent = location.scans.filter(
+            # Calculate total scans
+            try:
+                total_scans = QRCodeScan.objects.count()
+                recent_scans = QRCodeScan.objects.filter(
                     timestamp__date__gte=start_date
                 ).count()
+                logger.info(f"Total scans: {total_scans}, Recent scans: {recent_scans}")
+            except Exception as db_err:
+                logger.error(f"Database error counting scans: {str(db_err)}")
+                logger.error(traceback.format_exc())
+                await update.message.reply_text(
+                    "Ошибка при подсчете сканирований. Пожалуйста, попробуйте позже."
+                )
+                return
 
-                message += f"*{location.name}*\n"
-                message += f"Всего сканирований: {location_total}\n"
-                message += f"Недавние сканирования ({days} дней): {location_recent}\n"
+            # Format message
+            try:
+                message = f"📊 *Статистика QR-кодов - Все локации (Последние {days} дней)*\n\n"
+                message += f"*Всего сканирований по всем локациям: {total_scans}*\n"
+                message += f"*Недавние сканирования (Последние {days} дней): {recent_scans}*\n\n"
+                message += "*Разбивка по локациям:*\n\n"
 
-                # Рассчитываем процент от общего числа сканирований
-                if total_scans > 0:
-                    percentage = (location_total / total_scans) * 100
-                    message += f"Процент от общего числа: {percentage:.1f}%\n"
+                # Check if message is getting too long
+                if (
+                    len(message) > 3000
+                ):  # Telegram has a 4096 char limit, leaving room for location data
+                    logger.warning(
+                        "Message is getting too long, might exceed Telegram limits"
+                    )
+            except Exception as fmt_err:
+                logger.error(f"Error formatting message header: {str(fmt_err)}")
+                logger.error(traceback.format_exc())
+                await update.message.reply_text(
+                    "Ошибка при форматировании сообщения. Пожалуйста, попробуйте позже."
+                )
+                return
 
-                message += "\n"
+            # Add statistics for each location
+            location_errors = 0
+            for location in locations:
+                try:
+                    location_name = location.name
+                    logger.info(f"Processing location: {location_name}")
 
-            await update.message.reply_text(message, parse_mode="Markdown")
+                    location_total = location.scans.count()
+                    location_recent = location.scans.filter(
+                        timestamp__date__gte=start_date
+                    ).count()
+
+                    logger.info(
+                        f"Location {location_name}: Total={location_total}, Recent={location_recent}"
+                    )
+
+                    message += f"*{location_name}*\n"
+                    message += f"Всего сканирований: {location_total}\n"
+                    message += (
+                        f"Недавние сканирования ({days} дней): {location_recent}\n"
+                    )
+
+                    # Calculate percentage
+                    if total_scans > 0:
+                        percentage = (location_total / total_scans) * 100
+                        message += f"Процент от общего числа: {percentage:.1f}%\n"
+
+                    message += "\n"
+
+                    # Check if message is getting too long
+                    if len(message) > 3800:  # Getting close to Telegram's limit
+                        logger.warning("Message exceeds safe length, truncating")
+                        message += (
+                            "*Сообщение слишком длинное, показаны не все локации*\n"
+                        )
+                        break
+
+                except Exception as loc_err:
+                    logger.error(
+                        f"Error processing location {getattr(location, 'name', 'unknown')}: {str(loc_err)}"
+                    )
+                    location_errors += 1
+                    continue
+
+            if location_errors > 0:
+                logger.warning(f"Encountered errors with {location_errors} locations")
+                message += f"\n*Примечание: Не удалось получить данные для {location_errors} локаций*\n"
+
+            # Send the message
+            logger.info(f"Sending all_stats message, length: {len(message)} characters")
+            try:
+                await update.message.reply_text(message, parse_mode="Markdown")
+                logger.info("All stats message sent successfully")
+            except Exception as send_err:
+                logger.error(f"Error sending message: {str(send_err)}")
+                logger.error(traceback.format_exc())
+
+                # Try sending without markdown if that might be the issue
+                if "can't parse entities" in str(send_err).lower():
+                    logger.info("Attempting to send message without Markdown")
+                    await update.message.reply_text(
+                        "Ошибка форматирования. Отправка статистики без форматирования:"
+                    )
+                    # Strip markdown characters
+                    plain_message = message.replace("*", "").replace("_", "")
+                    await update.message.reply_text(plain_message)
+                else:
+                    await update.message.reply_text(
+                        "Ошибка при отправке сообщения. Пожалуйста, попробуйте позже."
+                    )
+
         except Exception as e:
-            logger.error(f"Error fetching all statistics: {str(e)}")
+            logger.error(f"Unexpected error in all_stats_command: {str(e)}")
+            logger.error(traceback.format_exc())
             await update.message.reply_text(
-                f"Ошибка при получении статистики. Пожалуйста, попробуйте позже."
+                f"Ошибка при получении статистики: {str(e)}. Пожалуйста, попробуйте позже."
             )
 
     async def compare_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
