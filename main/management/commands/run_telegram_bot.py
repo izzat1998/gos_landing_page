@@ -327,30 +327,16 @@ class Command(BaseCommand):
         await update.message.chat.send_action(action="typing")
 
         try:
-            # Get all locations with safer query approach
+            # Get all locations
             try:
-                # First check if we can connect to the database at all
-                from django.db import connection
+                locations = Location.objects.all()
+                locations_count = locations.count()
+                logger.info(f"Found {locations_count} locations")
 
-                cursor = connection.cursor()
-                cursor.execute("SELECT 1")
-                cursor.fetchone()
-                cursor.close()
-                logger.info("Database connection test successful")
-
-                # Use a simpler query first to test if Location model is accessible
-                location_count = Location.objects.count()
-                logger.info(f"Location count: {location_count}")
-
-                if location_count == 0:
+                if not locations.exists():
                     logger.warning("No locations found in database")
                     await update.message.reply_text("В базе данных не найдено локаций.")
                     return
-
-                # Now fetch the locations
-                locations = list(Location.objects.all())
-                logger.info(f"Successfully fetched {len(locations)} locations")
-
             except Exception as db_err:
                 logger.error(f"Database error fetching locations: {str(db_err)}")
                 logger.error(traceback.format_exc())
