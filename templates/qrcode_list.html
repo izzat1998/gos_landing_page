@@ -1,0 +1,18 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block content %}
+<h1>QR Codes for Locations</h1>
+<div class="qrcode-container" style="display: flex; flex-wrap: wrap; gap: 20px;">
+    {% for location in locations %}
+    <div class="qrcode-item" style="border: 1px solid #ddd; padding: 15px; border-radius: 5px; text-align: center; width: 200px;">
+        <h2>{{ location.name }}</h2>
+        <img src="{% url 'location_qrcode' location.id %}" alt="QR Code for {{ location.name }}" style="width: 150px; height: 150px;">
+        <p>Total Scans: {{ location.scans.count }}</p>
+        <p><a href="{% url 'location_qrcode' location.id %}" download="qrcode_{{ location.name }}.png" class="button" style="display: inline-block; background: #417690; color: white; padding: 5px 10px; text-decoration: none; border-radius: 4px;">Download</a></p>
+    </div>
+    {% empty %}
+    <p>No locations available. Please add locations in the admin panel.</p>
+    {% endfor %}
+</div>
+{% endblock %}
