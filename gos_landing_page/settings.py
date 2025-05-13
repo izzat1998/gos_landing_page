@@ -95,7 +95,7 @@ DATABASES = {
     }
 }
 
-
+API_TOKEN = env("API_TOKEN")
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
@@ -144,17 +144,17 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Telegram bot settings
-TELEGRAM_BOT_TOKEN = env('TELEGRAM_BOT_TOKEN', default='your_bot_token_here')
-SITE_URL = env('SITE_URL', default='http://localhost:8000')
-API_TOKEN = env('API_TOKEN', default='your_api_token_here')
+TELEGRAM_BOT_TOKEN = env("TELEGRAM_BOT_TOKEN", default="your_bot_token_here")
+SITE_URL = env("SITE_URL", default="http://localhost:8000")
+API_TOKEN = env("API_TOKEN", default="your_api_token_here")
 
 # REST Framework settings
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
     ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
     ],
 }
