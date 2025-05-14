@@ -1,5 +1,5 @@
-from django.core.exceptions import ProtectedError
 from django.db import models
+from django.db.models.deletion import ProtectedError
 
 # Create your models here.
 
