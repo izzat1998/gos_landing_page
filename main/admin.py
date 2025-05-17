@@ -10,6 +10,8 @@ from django.urls import path, reverse
 from django.utils import timezone
 from django.utils.html import format_html
 
+from users.models import CustomUser
+
 from .models import Location, QRCodeScan
 
 # Register your models here.
@@ -31,16 +33,18 @@ class QRCodeScanInline(admin.TabularInline):
 class LocationAdmin(admin.ModelAdmin):
     list_display = (
         "name",
+        "get_user",
         "created_at",
         "get_scan_count",
         "view_qr_code",
         "view_statistics",
     )
-    search_fields = ("name",)
+    search_fields = ("name", "user__username", "user__phone_number")
+    list_filter = ("user",)
     inlines = [QRCodeScanInline]
     readonly_fields = ("qr_code_preview",)
     fieldsets = (
-        (None, {"fields": ("name", "description")}),
+        (None, {"fields": ("name", "description", "user")}),
         (
             "QR Code",
             {
@@ -49,6 +53,13 @@ class LocationAdmin(admin.ModelAdmin):
             },
         ),
     )
+
+    def get_user(self, obj):
+        if obj.user:
+            return f"{obj.user.username} ({obj.user.phone_number})"
+        return "-"
+
+    get_user.short_description = "User"
 
     def get_urls(self):
         urls = super().get_urls()
