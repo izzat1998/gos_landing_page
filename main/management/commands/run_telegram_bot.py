@@ -206,29 +206,37 @@ class QRStatsBot:
             return 0
 
     async def _send_stats(
-        self,
-        update: Update,
-        days: int,
-        *,
-        admin_scope: bool,
-        edit: bool = False,
-    ) -> None:
-        """Fetches statistics and sends/edits message."""
+        self, update: Update, days: int, *, admin_scope: bool, edit: bool = False
+    ):
         try:
-            # Calculate date range
+            user = update.effective_user
             today = timezone.now().date()
             start = today - _dt.timedelta(days=days)
             date_range = f"{start.strftime('%d.%m.%Y')} — {today.strftime('%d.%m.%Y')}"
 
-            # Get data using sync_to_async
             get_locations = sync_to_async(self._get_locations)
             count_scans = sync_to_async(self._count_scans)
             count_location_scans = sync_to_async(self._count_location_scans)
 
-            # Fetch data asynchronously
-            total_scans = await count_scans(start)
+            if admin_scope:
+                total_scans = await count_scans(start)
+                locations = await get_locations()
+            else:
+                # Fetch user's location
+                user_locations = await sync_to_async(
+                    lambda: list(Location.objects.filter(user__username=user.username))
+                )()
+                if not user_locations:
+                    await update.effective_message.reply_text(
+                        "⛔ У вас нет доступной локации."
+                    )
+                    return
+                locations = user_locations
+                total_scans = sum(
+                    [await count_location_scans(loc.id, start) for loc in locations]
+                )
 
-            # Start building the message with a clear header
+            # Header
             if days == 0:
                 period_text = "сегодня"
             elif days == 1:
@@ -247,35 +255,23 @@ class QRStatsBot:
                 f"📈 *Общее количество сканирований: {total_scans}*",
             ]
 
-            # Add location stats if admin
-            if admin_scope and total_scans > 0:
-                locations = await get_locations()
-
-                # Add a section header for locations
+            if total_scans > 0:
                 parts.append("\n🗺️ *СТАТИСТИКА ПО ЛОКАЦИЯМ:*")
-
-                # Sort locations by scan count (descending)
                 loc_stats = []
                 for loc in locations:
                     loc_scans = await count_location_scans(loc.id, start)
                     share = (loc_scans / total_scans * 100) if total_scans > 0 else 0
                     loc_stats.append((loc.name, loc_scans, share))
 
-                # Sort by scan count (descending)
                 loc_stats.sort(key=lambda x: x[1], reverse=True)
 
-                # Add each location with a visual indicator of its share
                 for i, (name, scans, share) in enumerate(loc_stats, 1):
-                    # Create a visual bar based on percentage (each ■ = ~10%)
-                    bar_count = max(1, round(share / 10))
-                    bar = "■" * bar_count
-
-                    # Format with ranking number
+                    bar = "■" * max(1, round(share / 10))
                     parts.append(f"{i}. *{name}*: {scans} ({share:.1f}%)\n   {bar}")
 
-            # Join all parts and send
             msg = "\n".join(parts)
             await self._reply(update, msg, edit=edit)
+
         except Exception as e:
             logger.error(f"Error in _send_stats: {str(e)}")
             logger.error(traceback.format_exc())
