@@ -10,8 +10,6 @@ from django.urls import path, reverse
 from django.utils import timezone
 from django.utils.html import format_html
 
-from users.models import CustomUser
-
 from .models import Location, QRCodeScan
 
 # Register your models here.
@@ -55,11 +53,18 @@ class LocationAdmin(admin.ModelAdmin):
     )
 
     def get_user(self, obj):
-        if obj.user:
-            return f"{obj.user.username} ({obj.user.phone_number})"
+        users = obj.user.all()
+        if users:
+            # Display up to 2 users with their phone numbers
+            user_strings = [f"{user.username} ({user.phone_number})" for user in users[:2]]
+            display = ", ".join(user_strings)
+            # If there are more than 2 users, indicate that
+            if users.count() > 2:
+                display += f" +{users.count() - 2} more"
+            return display
         return "-"
 
-    get_user.short_description = "User"
+    get_user.short_description = "Users"
 
     def get_urls(self):
         urls = super().get_urls()
