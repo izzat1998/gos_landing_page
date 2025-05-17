@@ -34,6 +34,7 @@ from telegram.ext import (
 )
 
 from main.models import Location, QRCodeScan  # pylint: disable=import-error
+from users.models import CustomUser  # <-- Import user model
 
 logger = logging.getLogger(__name__)
 
@@ -95,6 +96,10 @@ class QRStatsBot:
         self.app.add_handler(CommandHandler("stats", self.cmd_stats))
         self.app.add_handler(CommandHandler("allstats", self.cmd_allstats))
 
+        from telegram.ext import MessageHandler, filters
+
+        self.app.add_handler(MessageHandler(filters.CONTACT, self.contact_handler))
+
         # callback queries
         self.app.add_handler(CallbackQueryHandler(self.cb_handler))
         # global error handler
@@ -104,23 +109,58 @@ class QRStatsBot:
 
     async def cmd_start(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         user = update.effective_user
-        is_admin = user and user.username in ADMIN_USERNAMES
-        text = (
-            "👋 Добро пожаловать!\n\n"
-            "/stats [d] — статистика по вашей локации (d дней, 30 по умол.)\n"
-            "/help — доступные команды"
-        )
-        if is_admin:
-            text += "\n\n🔐 *Admin*\n/allstats [d] — статистика по всем локациям"
-        await update.message.reply_text(text, parse_mode="Markdown")
+        telegram_id = str(user.id)
+        # Check registration by telegram_id
+        db_user = await sync_to_async(
+            lambda: CustomUser.objects.filter(telegram_id=telegram_id).first()
+        )()
+        if db_user:
+            # Registered: show confirmation and available locations
+            await update.message.reply_text(
+                "✅ Вы зарегистрированы!\n\nИспользуйте команду /stats для просмотра статистики по вашим локациям.",
+                parse_mode="Markdown",
+            )
+            # Show user's locations
+            locations = await sync_to_async(
+                lambda: list(Location.objects.filter(user=db_user))
+            )()
+            if locations:
+                loc_list = "\n".join(f"- {loc.name}" for loc in locations)
+                await update.message.reply_text(f"Ваши локации:\n{loc_list}")
+            else:
+                await update.message.reply_text("У вас пока нет связанных локаций.")
+        else:
+            # Not registered: ask for phone number
+            from telegram import KeyboardButton, ReplyKeyboardMarkup
+
+            kb = [
+                [KeyboardButton(text="Отправить номер телефона", request_contact=True)]
+            ]
+            await update.message.reply_text(
+                "Пожалуйста, отправьте свой номер телефона для регистрации:",
+                reply_markup=ReplyKeyboardMarkup(
+                    kb, one_time_keyboard=True, resize_keyboard=True
+                ),
+            )
 
     async def cmd_help(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         await self.cmd_start(update, context)
 
     async def cmd_stats(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        user = update.effective_user
+        telegram_id = str(user.id)
+        db_user = await sync_to_async(
+            lambda: CustomUser.objects.filter(telegram_id=telegram_id).first()
+        )()
+        if not db_user:
+            await update.message.reply_text(
+                "⛔ Сначала зарегистрируйтесь через /start."
+            )
+            return
         days = (
             int(context.args[0]) if context.args and context.args[0].isdigit() else 30
         )
+        # Only show stats for this user's locations
         await self._send_stats(update, days, admin_scope=False)
 
     @admin_only
@@ -138,6 +178,42 @@ class QRStatsBot:
             reply_markup=InlineKeyboardMarkup(kb),
             parse_mode="Markdown",
         )
+
+    # ─── Contact registration handler ─────────────────────────────────────────
+
+    async def contact_handler(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        contact = update.effective_message.contact
+        telegram_user = update.effective_user
+        if not contact or not contact.phone_number:
+            await update.message.reply_text(
+                "Не удалось получить номер телефона. Попробуйте ещё раз."
+            )
+            return
+        # Normalize phone number (remove spaces, +, etc.)
+        phone = contact.phone_number.replace(" ", "").replace("+", "")
+        db_user = await sync_to_async(
+            lambda: CustomUser.objects.filter(phone_number__endswith=phone[-9:]).first()
+        )()
+        if db_user:
+            # Update telegram_id
+            db_user.telegram_id = str(telegram_user.id)
+            await sync_to_async(db_user.save)()
+            await update.message.reply_text(
+                "✅ Вы успешно зарегистрированы! Теперь вы можете использовать /stats."
+            )
+            # Show user's locations
+            locations = await sync_to_async(
+                lambda: list(Location.objects.filter(user=db_user))
+            )()
+            if locations:
+                loc_list = "\n".join(f"- {loc.name}" for loc in locations)
+                await update.message.reply_text(f"Ваши локации:\n{loc_list}")
+            else:
+                await update.message.reply_text("У вас пока нет связанных локаций.")
+        else:
+            await update.message.reply_text(
+                "⛔ Ваш номер не найден в базе. Обратитесь к администратору."
+            )
 
     # ─── Callback queries ─────────────────────────────────────────────────────
 
@@ -222,9 +298,19 @@ class QRStatsBot:
                 total_scans = await count_scans(start)
                 locations = await get_locations()
             else:
-                # Fetch user's location
+                # Fetch user's location based on telegram_id
+                telegram_id = str(user.id)
+                db_user = await sync_to_async(
+                    lambda: CustomUser.objects.filter(telegram_id=telegram_id).first()
+                )()
+                if not db_user:
+                    await update.effective_message.reply_text(
+                        "⛔ Сначала зарегистрируйтесь через /start."
+                    )
+                    return
+
                 user_locations = await sync_to_async(
-                    lambda: list(Location.objects.filter(user__username=user.username))
+                    lambda: list(Location.objects.filter(user=db_user))
                 )()
                 if not user_locations:
                     await update.effective_message.reply_text(
