@@ -6,7 +6,8 @@ from .views import (
     LocationQRCodeView,
     LocationVisitView,
     LocationQRCodeListView,
-    LocationStatsAPIView
+    LocationStatsAPIView,
+    RecordPhoneClickView
 )
 
 urlpatterns = [
@@ -16,4 +17,5 @@ urlpatterns = [
     path("qrcodes/", LocationQRCodeListView.as_view(), name="qrcode_list"),
     path("api/location-stats/", LocationStatsAPIView.as_view(), name="location_stats_api"),
     path("api/token/", obtain_auth_token, name="api_token"),
+    path('api/record-phone-click/', RecordPhoneClickView.as_view(), name='record_phone_click'),
 ]

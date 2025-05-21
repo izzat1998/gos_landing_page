@@ -8,15 +8,23 @@ import datetime
 import qrcode
 from io import BytesIO
 
-from .models import Location, QRCodeScan
+from .models import Location, QRCodeScan, PhoneClick
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
 
 class LandingPageView(TemplateView):
     template_name = "main.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        visit_id = self.request.GET.get('visit_id')
+        if visit_id:
+            context['visit_id'] = visit_id
+        return context
 
 
 class LocationQRCodeView(DetailView):
@@ -46,11 +54,12 @@ class LocationVisitView(RedirectView):
     
     def get_redirect_url(self, *args, **kwargs):
         location_id = kwargs.get('location_id')
+        scan = None  # Initialize scan to None
         try:
             location = Location.objects.get(id=location_id)
             
             # Record the visit
-            QRCodeScan.objects.create(
+            scan = QRCodeScan.objects.create(
                 location=location,
                 ip_address=self.request.META.get('REMOTE_ADDR'),
                 user_agent=self.request.META.get('HTTP_USER_AGENT', '')
@@ -59,7 +68,9 @@ class LocationVisitView(RedirectView):
         except Location.DoesNotExist:
             pass
             
-        # Redirect to the homepage
+        # Redirect to the homepage with visit_id if available
+        if scan and scan.visit_id:
+            return f'/?visit_id={scan.visit_id}'
         return '/'
 
 
@@ -86,3 +97,33 @@ class LocationStatsAPIView(APIView):
         ).values('id', 'name', 'total_scans', 'recent_scans')
         
         return Response(locations)
+
+
+class RecordPhoneClickView(APIView):
+    def post(self, request, *args, **kwargs):
+        visit_id = request.data.get('visit_id')
+
+        if not visit_id:
+            return Response(
+                {"error": "visit_id is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            scan = QRCodeScan.objects.get(visit_id=visit_id)
+            PhoneClick.objects.create(scan=scan)
+            return Response(
+                {"status": "success", "message": "Phone click recorded"},
+                status=status.HTTP_201_CREATED
+            )
+        except QRCodeScan.DoesNotExist:
+            return Response(
+                {"error": "QRCodeScan not found for the provided visit_id"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            # Generic exception handler for unexpected errors
+            return Response(
+                {"error": "An unexpected error occurred: " + str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

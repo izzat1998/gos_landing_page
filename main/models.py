@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 from django.db.models.deletion import ProtectedError
 
@@ -33,7 +35,17 @@ class QRCodeScan(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     ip_address = models.GenericIPAddressField(null=True, blank=True)
     user_agent = models.TextField(blank=True)
+    visit_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
 
     class Meta:
         verbose_name = "Скан QR-кода"
         verbose_name_plural = "Сканы QR-кодов"
+
+
+class PhoneClick(models.Model):
+    scan = models.ForeignKey(QRCodeScan, on_delete=models.CASCADE, related_name='phone_clicks')
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Клик по номеру телефона"
+        verbose_name_plural = "Клики по номерам телефонов"
