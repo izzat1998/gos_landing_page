@@ -162,10 +162,113 @@
             max-width: 800px;
             margin: 0 auto;
         }
+
+        /* Dark mode toggle switch styles */
+        .theme-switch-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end; /* Align to the right */
+            padding: 10px;
+            position: fixed; /* Fixed position */
+            top: 10px; /* Distance from top */
+            right: 10px; /* Distance from right */
+            z-index: 1000; /* Ensure it's above other content */
+        }
+
+        .theme-switch {
+            display: inline-block;
+            height: 34px;
+            position: relative;
+            width: 60px;
+        }
+
+        .theme-switch input {
+            display: none;
+        }
+
+        .slider {
+            background-color: #ccc;
+            bottom: 0;
+            cursor: pointer;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            background-color: #fff;
+            bottom: 4px;
+            content: "";
+            height: 26px;
+            left: 4px;
+            position: absolute;
+            transition: .4s;
+            width: 26px;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: #1A4314; /* Dark green for active switch */
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(26px);
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #121212; /* Dark background */
+            color: #e0e0e0; /* Light text */
+        }
+
+        body.dark-mode .cta-button,
+        body.dark-mode .social-button {
+            background-color: #265920; /* Slightly lighter green for buttons in dark mode */
+            color: #e0e0e0;
+            border-color: #e0e0e0;
+        }
+        
+        body.dark-mode .cta-button:hover,
+        body.dark-mode .social-button:hover {
+            background-color: #1A4314;
+            filter: brightness(1.2);
+        }
+
+        body.dark-mode .phone-link {
+            color: #82d8ff; /* Light blue for links in dark mode */
+        }
+
+        body.dark-mode .benefits li::before {
+            color: #e0e0e0; /* Light color for checkmarks */
+        }
+
+        body.dark-mode .address {
+            border-top: 1px solid rgba(224, 224, 224, 0.2);
+            border-bottom: 1px solid rgba(224, 224, 224, 0.2);
+        }
+
+        body.dark-mode h1, 
+        body.dark-mode p.tagline,
+        body.dark-mode .address-title {
+            color: #e0e0e0;
+        }
+        body.dark-mode footer {
+            opacity: 0.8;
+        }
+
     </style>
 </head>
 
 <body>
+    <div class="theme-switch-wrapper">
+        <label class="theme-switch" for="checkbox">
+            <input type="checkbox" id="checkbox" />
+            <div class="slider round"></div>
+        </label>
+    </div>
 
     <div class="logo-container">
         <!-- Вставьте ваш логотип сюда -->
@@ -213,6 +316,30 @@
     <footer>
         © 2023 GOS Мебельная Компания. Все права защищены.
     </footer>
+
+    <script>
+        const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
+        const currentTheme = localStorage.getItem('theme');
+
+        if (currentTheme) {
+            document.body.classList.add(currentTheme);
+            if (currentTheme === 'dark-mode') {
+                toggleSwitch.checked = true;
+            }
+        }
+
+        function switchTheme(e) {
+            if (e.target.checked) {
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('theme', 'dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+                localStorage.setItem('theme', 'light-mode');
+            }
+        }
+
+        toggleSwitch.addEventListener('change', switchTheme, false);
+    </script>
 
 </body>
 
