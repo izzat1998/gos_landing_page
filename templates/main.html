@@ -283,7 +283,7 @@
     </div>
 
     <div style="display: flex; justify-content: center; flex-wrap: wrap;">
-        <a href="tel:+998903564334" class="cta-button">
+        <a href="tel:+998903564334" class="cta-button" id="cta-phone-button">
             📞 Обсудить проект
         </a>
         <a href="https://www.instagram.com/gos.mebel.uz" target="_blank" class="social-button">
@@ -296,7 +296,7 @@
         </a>
     </div>
     <p style="margin-bottom: 25px;">или</p>
-    <a href="tel:+998903564334" class="phone-link">Позвоните нам: +998 90 356 43 34</a>
+    <a href="tel:+998903564334" class.name = "phone-link" id="text-phone-link">Позвоните нам: +998 90 356 43 34</a>
 
 
     <div class="benefits">
@@ -341,6 +341,62 @@
         toggleSwitch.addEventListener('change', switchTheme, false);
     </script>
 
+    <script>
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const csrftoken = getCookie('csrftoken');
+        const visitId = "{{ visit_id|default:'' }}";
+
+        async function handlePhoneClick(event, phoneNumber) {
+            event.preventDefault();
+
+            if (visitId) {
+                try {
+                    const response = await fetch("{% url 'record_phone_click' %}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrftoken
+                        },
+                        body: JSON.stringify({ 'visit_id': visitId })
+                    });
+                    // Optional: handle response status or log errors
+                    if (!response.ok) {
+                        console.error('Failed to record phone click:', response.statusText);
+                    }
+                } catch (error) {
+                    console.error('Error recording phone click:', error);
+                }
+            }
+            window.location.href = 'tel:' + phoneNumber;
+        }
+
+        const ctaPhoneButton = document.getElementById('cta-phone-button');
+        if (ctaPhoneButton) {
+            ctaPhoneButton.addEventListener('click', function(event) {
+                handlePhoneClick(event, '+998903564334');
+            });
+        }
+
+        const textPhoneLink = document.getElementById('text-phone-link');
+        if (textPhoneLink) {
+            textPhoneLink.addEventListener('click', function(event) {
+                handlePhoneClick(event, '+998903564334');
+            });
+        }
+    </script>
 </body>
 
 </html>

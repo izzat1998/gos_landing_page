@@ -33,7 +33,7 @@ from telegram.ext import (
     ContextTypes,
 )
 
-from main.models import Location, QRCodeScan  # pylint: disable=import-error
+from main.models import Location, QRCodeScan, PhoneClick  # pylint: disable=import-error
 from users.models import CustomUser  # <-- Import user model
 
 logger = logging.getLogger(__name__)
@@ -281,6 +281,17 @@ class QRStatsBot:
             logger.error(f"Error in _count_location_scans_for_date: {str(e)}")
             return 0
 
+    def _count_location_phone_clicks(self, location_id: int, start_date=None) -> int:
+        """Count phone clicks for a specific location."""
+        try:
+            qs = PhoneClick.objects.filter(scan__location_id=location_id)
+            if start_date:
+                qs = qs.filter(scan__timestamp__date__gte=start_date)
+            return qs.count()
+        except Exception as e:
+            logger.error(f"Error in _count_location_phone_clicks: {str(e)}")
+            return 0
+
     async def _send_stats(
         self, update: Update, days: int, *, admin_scope: bool, edit: bool = False
     ):
@@ -293,10 +304,19 @@ class QRStatsBot:
             get_locations = sync_to_async(self._get_locations)
             count_scans = sync_to_async(self._count_scans)
             count_location_scans = sync_to_async(self._count_location_scans)
+            count_location_phone_clicks = sync_to_async(self._count_location_phone_clicks)
+
+            total_phone_clicks_overall = 0
 
             if admin_scope:
                 total_scans = await count_scans(start)
                 locations = await get_locations()
+                # Simpler way for admin scope overall total phone clicks
+                total_phone_clicks_overall = await sync_to_async(
+                    lambda: PhoneClick.objects.filter(scan__timestamp__date__gte=start).count()
+                    if start_date # In this context, start_date is 'start'
+                    else PhoneClick.objects.count()
+                )()
             else:
                 # Fetch user's location based on telegram_id
                 telegram_id = str(user.id)
@@ -318,9 +338,11 @@ class QRStatsBot:
                     )
                     return
                 locations = user_locations
-                total_scans = sum(
-                    [await count_location_scans(loc.id, start) for loc in locations]
-                )
+                total_scans = 0
+                for loc in locations:
+                    total_scans += await count_location_scans(loc.id, start)
+                    total_phone_clicks_overall += await count_location_phone_clicks(loc.id, start)
+
 
             # Header
             if days == 0:
@@ -339,21 +361,24 @@ class QRStatsBot:
                 f"Период: {date_range}",
                 f"━━━━━━━━━━━━━━━━━━━━━",
                 f"📈 *Общее количество сканирований: {total_scans}*",
+                f"📱 *Общее количество кликов на телефон: {total_phone_clicks_overall}*",
             ]
 
-            if total_scans > 0:
+            if total_scans > 0 or total_phone_clicks_overall > 0: # Show stats if there's any activity
                 parts.append("\n🗺️ *СТАТИСТИКА ПО ЛОКАЦИЯМ:*")
                 loc_stats = []
                 for loc in locations:
                     loc_scans = await count_location_scans(loc.id, start)
+                    loc_phone_clicks = await count_location_phone_clicks(loc.id, start)
                     share = (loc_scans / total_scans * 100) if total_scans > 0 else 0
-                    loc_stats.append((loc.name, loc_scans, share))
+                    loc_stats.append((loc.name, loc_scans, loc_phone_clicks, share))
 
-                loc_stats.sort(key=lambda x: x[1], reverse=True)
+                # Sort by total scans primarily, then by phone clicks
+                loc_stats.sort(key=lambda x: (x[1], x[2]), reverse=True)
 
-                for i, (name, scans, share) in enumerate(loc_stats, 1):
-                    bar = "■" * max(1, round(share / 10))
-                    parts.append(f"{i}. *{name}*: {scans} ({share:.1f}%)\n   {bar}")
+                for i, (name, scans, phone_clicks, share) in enumerate(loc_stats, 1):
+                    bar = "■" * max(1, round(share / 10)) if total_scans > 0 else "" # Ensure bar is not generated if no scans
+                    parts.append(f"{i}. *{name}*: 📞 {phone_clicks} / 📷 {scans} ({share:.1f}%)\n   {bar if bar else ''}")
 
             msg = "\n".join(parts)
             await self._reply(update, msg, edit=edit)

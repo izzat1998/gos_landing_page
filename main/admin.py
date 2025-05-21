@@ -10,7 +10,7 @@ from django.urls import path, reverse
 from django.utils import timezone
 from django.utils.html import format_html
 
-from .models import Location, QRCodeScan
+from .models import Location, QRCodeScan, PhoneClick
 
 # Register your models here.
 
@@ -191,3 +191,30 @@ class QRCodeScanAdmin(admin.ModelAdmin):
 
     def has_change_permission(self, request, obj=None):
         return False
+
+
+@admin.register(PhoneClick)
+class PhoneClickAdmin(admin.ModelAdmin):
+    list_display = ('get_scan_location', 'get_scan_visit_id', 'timestamp')
+    list_filter = ('scan__location', 'timestamp')
+    date_hierarchy = 'timestamp'
+    readonly_fields = ('scan', 'timestamp')
+
+    def get_scan_location(self, obj):
+        return obj.scan.location.name
+    get_scan_location.short_description = 'Location'
+    get_scan_location.admin_order_field = 'scan__location'
+
+    def get_scan_visit_id(self, obj):
+        return obj.scan.visit_id
+    get_scan_visit_id.short_description = 'Visit ID'
+    get_scan_visit_id.admin_order_field = 'scan__visit_id'
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+        
+    # Optional: def has_delete_permission(self, request, obj=None):
+    #    return False # If you don't want them to be deletable from admin

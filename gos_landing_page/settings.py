@@ -86,7 +86,7 @@ WSGI_APPLICATION = "gos_landing_page.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
+        "ENGINE": env("DB_ENGINE", default="django.db.backends.sqlite3"),
         "NAME": env("DB_NAME"),
         "USER": env("DB_USER"),
         "PASSWORD": env("DB_PASSWORD"),
@@ -95,7 +95,6 @@ DATABASES = {
     }
 }
 
-API_TOKEN = env("API_TOKEN")
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
