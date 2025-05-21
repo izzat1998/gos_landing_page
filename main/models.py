@@ -35,7 +35,7 @@ class QRCodeScan(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     ip_address = models.GenericIPAddressField(null=True, blank=True)
     user_agent = models.TextField(blank=True)
-    visit_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    visit_id = models.UUIDField(default=uuid.uuid4, editable=False, null=True)
 
     class Meta:
         verbose_name = "Скан QR-кода"
