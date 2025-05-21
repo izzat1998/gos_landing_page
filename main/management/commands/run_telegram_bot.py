@@ -33,7 +33,7 @@ from telegram.ext import (
     ContextTypes,
 )
 
-from main.models import Location, QRCodeScan, PhoneClick  # pylint: disable=import-error
+from main.models import Location, PhoneClick, QRCodeScan  # pylint: disable=import-error
 from users.models import CustomUser  # <-- Import user model
 
 logger = logging.getLogger(__name__)
@@ -290,6 +290,7 @@ class QRStatsBot:
             return qs.count()
         except Exception as e:
             logger.error(f"Error in _count_location_phone_clicks: {str(e)}")
+            logger.error(traceback.format_exc())
             return 0
 
     async def _send_stats(
@@ -304,19 +305,23 @@ class QRStatsBot:
             get_locations = sync_to_async(self._get_locations)
             count_scans = sync_to_async(self._count_scans)
             count_location_scans = sync_to_async(self._count_location_scans)
-            count_location_phone_clicks = sync_to_async(self._count_location_phone_clicks)
+            count_location_phone_clicks = sync_to_async(
+                self._count_location_phone_clicks
+            )
 
             total_phone_clicks_overall = 0
 
             if admin_scope:
                 total_scans = await count_scans(start)
                 locations = await get_locations()
-                # Simpler way for admin scope overall total phone clicks
-                total_phone_clicks_overall = await sync_to_async(
-                    lambda: PhoneClick.objects.filter(scan__timestamp__date__gte=start).count()
-                    if start_date # In this context, start_date is 'start'
-                    else PhoneClick.objects.count()
-                )()
+                # Use the same approach as user scope for consistency
+                total_phone_clicks_overall = 0
+                try:
+                    for loc in locations:
+                        total_phone_clicks_overall += await count_location_phone_clicks(loc.id, start)
+                except Exception as e:
+                    logger.error(f"Error counting admin phone clicks: {str(e)}")
+                    logger.error(traceback.format_exc())
             else:
                 # Fetch user's location based on telegram_id
                 telegram_id = str(user.id)
@@ -341,8 +346,9 @@ class QRStatsBot:
                 total_scans = 0
                 for loc in locations:
                     total_scans += await count_location_scans(loc.id, start)
-                    total_phone_clicks_overall += await count_location_phone_clicks(loc.id, start)
-
+                    total_phone_clicks_overall += await count_location_phone_clicks(
+                        loc.id, start
+                    )
 
             # Header
             if days == 0:
@@ -363,8 +369,15 @@ class QRStatsBot:
                 f"📈 *Общее количество сканирований: {total_scans}*",
                 f"📱 *Общее количество кликов на телефон: {total_phone_clicks_overall}*",
             ]
+            
+            # Add conversion rate if there are scans
+            if total_scans > 0:
+                conversion_rate = (total_phone_clicks_overall / total_scans) * 100
+                parts.append(f"📊 *Конверсия сканирований в звонки: {conversion_rate:.1f}%*")
 
-            if total_scans > 0 or total_phone_clicks_overall > 0: # Show stats if there's any activity
+            if (
+                total_scans > 0 or total_phone_clicks_overall > 0
+            ):  # Show stats if there's any activity
                 parts.append("\n🗺️ *СТАТИСТИКА ПО ЛОКАЦИЯМ:*")
                 loc_stats = []
                 for loc in locations:
@@ -377,8 +390,16 @@ class QRStatsBot:
                 loc_stats.sort(key=lambda x: (x[1], x[2]), reverse=True)
 
                 for i, (name, scans, phone_clicks, share) in enumerate(loc_stats, 1):
-                    bar = "■" * max(1, round(share / 10)) if total_scans > 0 else "" # Ensure bar is not generated if no scans
-                    parts.append(f"{i}. *{name}*: 📞 {phone_clicks} / 📷 {scans} ({share:.1f}%)\n   {bar if bar else ''}")
+                    bar = (
+                        "■" * max(1, round(share / 10)) if total_scans > 0 else ""
+                    )  # Ensure bar is not generated if no scans
+                    
+                    # Calculate location-specific conversion rate
+                    loc_conversion = (phone_clicks / scans * 100) if scans > 0 else 0
+                    
+                    parts.append(
+                        f"{i}. *{name}*: 📞 {phone_clicks} / 📷 {scans} ({share:.1f}%)\n   {bar if bar else ''}\n   Конверсия: {loc_conversion:.1f}%"
+                    )
 
             msg = "\n".join(parts)
             await self._reply(update, msg, edit=edit)

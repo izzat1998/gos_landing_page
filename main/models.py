@@ -43,7 +43,9 @@ class QRCodeScan(models.Model):
 
 
 class PhoneClick(models.Model):
-    scan = models.ForeignKey(QRCodeScan, on_delete=models.CASCADE, related_name='phone_clicks')
+    scan = models.ForeignKey(
+        QRCodeScan, on_delete=models.CASCADE, related_name="phone_clicks"
+    )
     timestamp = models.DateTimeField(auto_now_add=True)
 
     class Meta:
