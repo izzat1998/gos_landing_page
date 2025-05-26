@@ -26,7 +26,7 @@ class LandingPageView(TemplateView):
             context['visit_id'] = visit_id
             
         # Add furniture categories to the context
-        context['categories'] = FurnitureCategory.objects.filter(is_active=True).order_by('order', 'name')[:4]
+        context['categories'] = FurnitureCategory.objects.filter(is_active=True).order_by('order', 'name')
         return context
 
 
