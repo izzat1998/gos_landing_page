@@ -4,13 +4,13 @@
     --primary-color-dark: #122F0E;
     --primary-color-light: #2A6324;
     --primary-color-rgb: 26, 67, 20;
-    --text-color: #333333;
-    --text-color-secondary: #666666;
+    --text-color: #333;
+    --text-color-secondary: #666;
     --light-bg: #f9f9f9;
-    --card-bg: #ffffff;
+    --card-bg: #fff;
     --border-color: #e0e0e0;
-    --white: #ffffff;
-    --black: #000000;
+    --white: #fff;
+    --black: #000;
     --success: #28a745;
     --warning: #ffc107;
     --danger: #dc3545;
@@ -25,67 +25,24 @@ body.dark-mode {
     --text-color: #e0e0e0;
     --text-color-secondary: #b0b0b0;
     --light-bg: #2a2a2a;
-    --card-bg: #333333;
-    --border-color: #444444;
+    --card-bg: #333;
+    --border-color: #444;
     --white: #1a1a1a;
-    --black: #ffffff;
+    --black: #fff;
 }
 
 /* Main Page Specific Styles */
 
 /* Base Styles */
+/* Most body styles are inherited from base.css */
 body {
-    margin: 0;
-    font-family: 'Montserrat', sans-serif;
-    background-color: #FFFFFF;
-    color: #1A4314;
-    min-height: 100vh;
-    padding: 0;
-    box-sizing: border-box;
-    text-align: center;
-    line-height: 1.6;
-    overflow-x: hidden;
+    text-align: center; /* Main page specific: center align body content */
 }
 
-/* Header and Navigation */
-header {
-    width: 100%;
-    background-color: rgba(255, 255, 255, 0.98);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    padding: 15px 0;
-    backdrop-filter: blur(10px);
-}
-
-.container {
-    width: 90%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-}
-
-.header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.logo-container {
-    display: flex;
-    align-items: center;
-}
-
-.logo-container img {
-    max-width: 120px;
-    height: auto;
-    transition: transform 0.3s ease;
-}
-
-.logo-container:hover img {
-    transform: scale(1.05);
-}
+/* Header and Navigation styles are inherited from base.css */
+/* .container styles are inherited from base.css */
+/* .header-content styles are inherited from base.css */
+/* .logo-container styles are inherited from base.css */
 
 /* Hero Section */
 .hero-section {
@@ -96,7 +53,7 @@ header {
     align-items: center;
     justify-content: center;
     text-align: center;
-    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5));
+    background: linear-gradient(rgb(0 0 0 / 50%), rgb(0 0 0 / 50%));
     background-size: cover;
     background-position: center;
     color: white;
@@ -112,12 +69,11 @@ header {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, rgba(26, 67, 20, 0.03) 0%, rgba(255, 255, 255, 0) 50%);
+    background: linear-gradient(135deg, rgb(26 67 20 / 3%) 0%, rgb(255 255 255 / 0%) 50%);
     z-index: 0;
 }
 
 .hero-content {
-    max-width: 800px;
     padding: 0 20px;
     position: relative;
     z-index: 1;
@@ -163,14 +119,14 @@ header {
     align-items: center;
     justify-content: center;
     background-color: #1A4314;
-    color: #FFFFFF;
+    color: #FFF;
     padding: 16px 32px;
     font-size: 1.1em;
     font-weight: 600;
     text-decoration: none;
     border-radius: 50px;
     transition: all 0.3s ease;
-    box-shadow: 0 6px 15px rgba(26, 67, 20, 0.2);
+    box-shadow: 0 6px 15px rgb(26 67 20 / 20%);
     border: none;
     min-width: 180px;
 }
@@ -178,7 +134,7 @@ header {
 .cta-button i,
 .social-button i {
     margin-right: 10px;
-    font-size: 1.2em;
+    font-size: 1.1rem; /* Updated font size */
 }
 
 .social-button {
@@ -237,7 +193,7 @@ header {
 .primary-button:hover {
     background-color: #265920;
     transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(26, 67, 20, 0.3);
+    box-shadow: 0 10px 20px rgb(26 67 20 / 30%);
 }
 
 .secondary-button {
@@ -247,9 +203,9 @@ header {
 }
 
 .secondary-button:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgb(255 255 255 / 10%);
     transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 20px rgb(255 255 255 / 10%);
 }
 
 /* Catalog Action Button Styles */
@@ -273,7 +229,7 @@ header {
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 6px 12px rgb(0 0 0 / 15%);
     border: none;
     position: relative;
     overflow: hidden;
@@ -287,27 +243,27 @@ header {
 .catalog-action-button:hover {
     background-color: var(--primary-color-dark);
     transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 10px 20px rgb(0 0 0 / 20%);
 }
 
 .catalog-action-button:active {
     transform: translateY(-2px);
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 5px 10px rgb(0 0 0 / 15%);
 }
 
 /* Button hover effect */
-.catalog-action-button:before {
+.catalog-action-button::before {
     content: '';
     position: absolute;
     top: 0;
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 20%), transparent);
     transition: left 0.7s ease;
 }
 
-.catalog-action-button:hover:before {
+.catalog-action-button:hover::before {
     left: 100%;
 }
 
@@ -337,19 +293,20 @@ body.dark-mode .benefits-section {
 
 .benefits-grid {
     display: grid;
+
     /* For larger screens, aim for 4 columns */
     grid-template-columns: repeat(4, 1fr);
     gap: 30px;
 }
 
 /* Responsive adjustments for benefits grid */
-@media (max-width: 1200px) { /* Adjust breakpoint as needed */
+@media (width <= 1200px) { /* Adjust breakpoint as needed */
     .benefits-grid {
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Fallback to auto-fit for medium screens */
     }
 }
 
-@media (max-width: 768px) { /* Adjust breakpoint as needed */
+@media (width <= 768px) { /* Adjust breakpoint as needed */
     .benefits-grid {
         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Further adjust for smaller screens */
     }
@@ -360,13 +317,13 @@ body.dark-mode .benefits-section {
     border-radius: 10px;
     padding: 30px 20px;
     text-align: center;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 5px 15px rgb(0 0 0 / 5%);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .benefit-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 25px rgb(0 0 0 / 10%);
 }
 
 .benefit-icon {
@@ -409,7 +366,7 @@ body.dark-mode .benefit-description {
     border-radius: 12px;
     padding: 30px 20px;
     text-align: center;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 10px 30px rgb(0 0 0 / 5%);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     height: 100%;
     display: flex;
@@ -420,7 +377,7 @@ body.dark-mode .benefit-description {
 
 .contact-card:hover {
     transform: translateY(-10px);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 15px 35px rgb(0 0 0 / 10%);
 }
 
 .contact-icon {
@@ -432,7 +389,7 @@ body.dark-mode .benefit-description {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: rgba(26, 67, 20, 0.1);
+    background-color: rgb(26 67 20 / 10%);
     border-radius: 50%;
     transition: background-color 0.3s ease, transform 0.3s ease;
 }
@@ -468,7 +425,7 @@ body.dark-mode .benefit-description {
     color: var(--primary-color-dark);
 }
 
-.contact-link:after {
+.contact-link::after {
     content: '';
     position: absolute;
     width: 0;
@@ -479,7 +436,7 @@ body.dark-mode .benefit-description {
     transition: width 0.3s ease;
 }
 
-.contact-link:hover:after {
+.contact-link:hover::after {
     width: 100%;
 }
 
@@ -503,7 +460,7 @@ body.dark-mode .benefit-description {
     justify-content: center;
     transition: all 0.3s ease;
     cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px rgb(0 0 0 / 10%);
     border: none;
     position: relative;
     overflow: hidden;
@@ -514,11 +471,11 @@ body.dark-mode .benefit-description {
     color: white;
 }
 
-.social-button {
-    background-color: white;
-    color: var(--primary-color);
-    border: 2px solid var(--primary-color);
-}
+/* Removed duplicate .social-button definition. 
+   The primary style with gradient background is kept (around line 188).
+   Shared styles are handled by the multi-selector block:
+   .cta-button, .social-button, .view-all-button, .submit-button
+*/
 
 .view-all-button {
     background-color: transparent;
@@ -530,55 +487,54 @@ body.dark-mode .benefit-description {
 .cta-button:hover, .submit-button:hover {
     background-color: var(--primary-color-dark);
     transform: translateY(-3px);
-    box-shadow: 0 7px 14px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 7px 14px rgb(0 0 0 / 15%);
 }
 
 .social-button:hover {
     background-color: var(--primary-color);
     color: white;
     transform: translateY(-3px);
-    box-shadow: 0 7px 14px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 7px 14px rgb(0 0 0 / 15%);
 }
 
 .view-all-button:hover {
     background-color: var(--primary-color);
     color: white;
     transform: translateY(-3px);
-    box-shadow: 0 7px 14px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 7px 14px rgb(0 0 0 / 15%);
 }
 
 .cta-button:active, .social-button:active, .view-all-button:active, .submit-button:active {
     transform: translateY(-1px);
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 5px 10px rgb(0 0 0 / 12%);
 }
 
-.cta-button i, .social-button i {
-    margin-right: 10px;
-    font-size: 1.1rem;
-}
+/* Removed duplicate '.cta-button i, .social-button i' definition.
+   The first definition (around line 178) has been updated.
+*/
 
 .contact-cta-button, .contact-social-button {
     min-width: 200px;
 }
 
 /* Button hover effect */
-.cta-button:before, .social-button:before, .view-all-button:before {
+.cta-button::before, .social-button::before, .view-all-button::before {
     content: '';
     position: absolute;
     top: 0;
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 20%), transparent);
     transition: left 0.7s ease;
 }
 
-.cta-button:hover:before, .social-button:hover:before, .view-all-button:hover:before {
+.cta-button:hover::before, .social-button:hover::before, .view-all-button:hover::before {
     left: 100%;
 }
 
 /* Responsive adjustments */
-@media (max-width: 992px) {
+@media (width <= 992px) {
     .contact-info {
         grid-template-columns: repeat(2, 1fr);
     }
@@ -593,7 +549,7 @@ body.dark-mode .benefit-description {
     }
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .section-title h2 {
         font-size: 1.8rem;
     }
@@ -616,7 +572,7 @@ body.dark-mode .benefit-description {
     }
 }
 
-@media (max-width: 576px) {
+@media (width <= 576px) {
     .contact-info {
         grid-template-columns: 1fr;
     }
@@ -661,18 +617,23 @@ body.dark-mode .benefit-description {
     background-color: white;
     border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 5px 15px rgb(0 0 0 / 5%);
     transition: transform 0.3s, box-shadow 0.3s;
-}
-
-body.dark-mode .product-card {
-    background-color: #2a2a2a;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .product-card:hover {
     transform: translateY(-10px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 15px 30px rgb(0 0 0 / 10%);
+}
+
+body.dark-mode .product-card {
+    background-color: #2a2a2a;
+    box-shadow: 0 5px 15px rgb(0 0 0 / 20%);
+}
+
+body.dark-mode .product-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgb(0 0 0 / 15%); /* Adapted from light mode, potentially adjusted alpha */
 }
 
 .product-image {
@@ -738,11 +699,11 @@ body.dark-mode .categories-section {
     height: 250px;
     border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 5px 15px rgb(0 0 0 / 10%);
 }
 
 body.dark-mode .category-card {
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 5px 15px rgb(0 0 0 / 30%);
 }
 
 .category-image {
@@ -761,7 +722,7 @@ body.dark-mode .category-card {
     bottom: 0;
     left: 0;
     right: 0;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.4), transparent);
+    background: linear-gradient(to top, rgb(0 0 0 / 80%), rgb(0 0 0 / 40%), transparent);
     padding: 20px;
     color: white;
     transition: all 0.3s ease;
@@ -772,7 +733,7 @@ body.dark-mode .category-card {
 }
 
 .category-card:hover .category-overlay {
-    background: linear-gradient(to top, rgba(26, 67, 20, 0.9), transparent);
+    background: linear-gradient(to top, rgb(26 67 20 / 90%), transparent);
 }
 
 .category-overlay h3 {
@@ -786,7 +747,7 @@ body.dark-mode .category-card {
     margin-top: 15px;
     font-weight: 600;
     color: white;
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: rgb(255 255 255 / 20%);
     padding: 8px 16px;
     border-radius: 30px;
     transition: all 0.3s ease;
@@ -802,7 +763,7 @@ body.dark-mode .category-card {
     background-color: white;
     color: var(--primary-color);
     transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 5px 15px rgb(0 0 0 / 10%);
 }
 
 .category-card:hover .category-button i {
@@ -824,12 +785,12 @@ body.dark-mode .category-card {
     background-color: white;
     border-radius: 10px;
     padding: 30px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 5px 15px rgb(0 0 0 / 5%);
 }
 
 body.dark-mode .testimonial-card {
     background-color: #2a2a2a;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 5px 15px rgb(0 0 0 / 20%);
 }
 
 .testimonial-content {
@@ -871,9 +832,9 @@ body.dark-mode .author-info p {
 }
 
 /* CTA Section */
-.cta-section {
+.bottom-cta-section { /* Renamed from .cta-section */
     padding: 80px 0;
-    background: linear-gradient(rgba(26, 67, 20, 0.9), rgba(26, 67, 20, 0.9)), url('../images/cta-bg.jpg');
+    background: linear-gradient(rgb(26 67 20 / 90%), rgb(26 67 20 / 90%)), url('../images/cta-bg.jpg');
     background-size: cover;
     background-position: center;
     color: white;
@@ -903,7 +864,7 @@ body.dark-mode .author-info p {
 }
 
 /* Responsive adjustments */
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .hero-title {
         font-size: 2.2em;
     }

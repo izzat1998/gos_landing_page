@@ -25,7 +25,7 @@ function initializeGallery() {
         // Set up error handling for main image
         mainImage.onerror = function () {
             console.error('Failed to load main image');
-            this.src = '/static/images/placeholder.jpg'; // Fallback image path
+            this.src = '/static/images/furniture.png'; // Updated fallback image path
         };
 
         // Set up thumbnail clicks
@@ -45,7 +45,7 @@ function initializeGallery() {
             // Add error handling for thumbnails
             thumbnail.onerror = function () {
                 console.error('Failed to load thumbnail');
-                this.src = '/static/images/placeholder.jpg'; // Fallback image
+                this.src = '/static/images/furniture.png'; // Updated fallback image
                 this.style.opacity = '0.5'; // Visual indication of error
             };
         });

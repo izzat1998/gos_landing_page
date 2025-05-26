@@ -8,7 +8,9 @@ if (currentTheme) {
     
     if (currentTheme === 'dark') {
         document.body.classList.add('dark-mode');
-        toggleSwitch.checked = true;
+        if (toggleSwitch) { // Null check for toggleSwitch
+            toggleSwitch.checked = true;
+        }
     }
 }
 
@@ -26,4 +28,6 @@ function switchTheme(e) {
 }
 
 // Event listener for theme switch
-toggleSwitch.addEventListener('change', switchTheme, false);
+if (toggleSwitch) { // Null check for toggleSwitch
+    toggleSwitch.addEventListener('change', switchTheme, false);
+}

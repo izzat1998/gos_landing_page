@@ -18,17 +18,14 @@
 
 .slider {
     background-color: #ccc;
-    bottom: 0;
+    inset: 0;
     cursor: pointer;
-    left: 0;
     position: absolute;
-    right: 0;
-    top: 0;
     transition: .4s;
     border-radius: 34px;
 }
 
-.slider:before {
+.slider::before {
     background-color: #fff;
     bottom: 4px;
     content: "";
@@ -44,108 +41,116 @@ input:checked + .slider {
     background-color: #1A4314;
 }
 
-input:checked + .slider:before {
+input:checked + .slider::before {
     transform: translateX(26px);
 }
 
 /* Dark Mode Styles */
 body.dark-mode {
-    background-color: #121212;
-    color: #e0e0e0;
+    background-color: var(--light-bg); /* #121212 was very dark, mapped to general dark bg */
+    color: var(--text-color);
 }
 
 body.dark-mode header {
-    background-color: rgba(30, 30, 30, 0.98);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    background-color: var(--card-bg); /* rgb(30 30 30 / 98%) is close to #333 */
+    box-shadow: 0 2px 10px rgb(0 0 0 / 20%); /* Kept specific shadow for header */
+}
+
+/* Moved body.dark-mode a before body.dark-mode .nav-menu a to fix no-descending-specificity */
+body.dark-mode a {
+    color: var(--primary-color); /* #8be67c mapped to dark mode primary */
 }
 
 body.dark-mode .nav-menu a {
-    color: #e0e0e0;
+    color: var(--text-color);
 }
 
 body.dark-mode .nav-menu a::after {
-    background-color: #8be67c;
+    background-color: var(--primary-color); /* #8be67c mapped to dark mode primary */
 }
 
 body.dark-mode .nav-menu a:hover {
-    color: #8be67c;
+    color: var(--primary-color-light); /* Use lighter primary for hover */
 }
 
 body.dark-mode .mobile-menu-btn {
-    color: #e0e0e0;
+    color: var(--text-color);
 }
 
 body.dark-mode footer {
-    background-color: #0a1f08;
+    background-color: var(--primary-color-dark); /* #0a1f08 mapped to darker primary */
+    opacity: 0.8; /* Merged from later definition */
 }
 
 /* Additional dark mode styles for common elements */
 body.dark-mode .card,
 body.dark-mode .item-card,
 body.dark-mode .category-card {
-    background-color: #1e1e1e;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    background-color: var(--card-bg); /* #1e1e1e mapped to card background */
+    box-shadow: 0 4px 15px rgb(0 0 0 / 30%); /* Kept specific shadow */
 }
 
-body.dark-mode a {
-    color: #8be67c;
+body.dark-mode button { /* This is a general button style */
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    border: 1px solid var(--primary-color-light); /* Adding a subtle border */
 }
 
-body.dark-mode button {
-    background-color: #1A4314;
-    color: #e0e0e0;
+body.dark-mode button:hover {
+    background-color: var(--primary-color-light);
 }
 
 /* Dark mode form elements */
 body.dark-mode input,
 body.dark-mode textarea,
 body.dark-mode select {
-    background-color: #333;
-    color: #e0e0e0;
-    border: 1px solid #444;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
 }
 
 body.dark-mode input::placeholder,
 body.dark-mode textarea::placeholder {
-    color: #999;
+    color: var(--text-color-secondary); /* #999 mapped to text-secondary */
 }
 
 /* Additional dark mode styles from main.html */
+/* These specific button styles might override the general body.dark-mode button if needed,
+   or be refactored if the general one is sufficient. */
 body.dark-mode .cta-button,
-body.dark-mode .social-button {
-    background-color: #265920;
-    /* Slightly lighter green for buttons in dark mode */
-    color: #e0e0e0;
-    border-color: #e0e0e0;
+body.dark-mode .social-button { /* .social-button has its own specific styling in main.css */
+    background-color: var(--primary-color); /* #265920 is close to dark mode --primary-color */
+    color: var(--text-color);
+    border-color: var(--primary-color-light); /* Using a lighter border */
 }
 
 body.dark-mode .cta-button:hover,
 body.dark-mode .social-button:hover {
-    background-color: #1A4314;
-    filter: brightness(1.2);
+    background-color: var(--primary-color-dark);
+    filter: brightness(1.2); /* Keep brightness for now, can be removed if color change is enough */
 }
 
 body.dark-mode .phone-link {
-    color: #82d8ff;
-    /* Light blue for links in dark mode */
+    color: var(--info); /* #82d8ff mapped to --info blue */
 }
 
 body.dark-mode .benefits li::before {
-    color: #e0e0e0;
-    /* Light color for checkmarks */
+    color: var(--text-color);
 }
 
 body.dark-mode .address {
-    border-top: 1px solid rgba(224, 224, 224, 0.2);
-    border-bottom: 1px solid rgba(224, 224, 224, 0.2);
+    /* rgb(224 224 224 / 20%) is a light, semi-transparent border.
+       var(--border-color) is #444. This needs a different variable or direct value if distinct.
+       For now, using var(--border-color) and accepting it will be opaque.
+       A better solution would be a new variable like --border-color-translucent-light. */
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
 }
 
 body.dark-mode h1,
 body.dark-mode p.tagline,
 body.dark-mode .address-title {
-    color: #e0e0e0;
+    color: var(--text-color);
 }
 
-body.dark-mode footer {
-    opacity: 0.8;
-}
+/* Removed duplicate body.dark-mode footer definition. Merged into earlier definition. */

@@ -63,7 +63,7 @@ body.dark-mode .breadcrumbs span {
 .item-card {
     border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 15px rgb(0 0 0 / 10%);
     transition: transform 0.3s, box-shadow 0.3s;
     background-color: #fff;
     height: 100%;
@@ -71,14 +71,19 @@ body.dark-mode .breadcrumbs span {
     flex-direction: column;
 }
 
-body.dark-mode .item-card {
-    background-color: #1e1e1e;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-}
-
 .item-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 10px 25px rgb(0 0 0 / 15%);
+}
+
+body.dark-mode .item-card {
+    background-color: #1e1e1e;
+    box-shadow: 0 4px 15px rgb(0 0 0 / 30%);
+}
+
+body.dark-mode .item-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgb(0 0 0 / 25%); /* Adapted from light mode, potentially adjusted alpha */
 }
 
 .item-image {
@@ -171,11 +176,11 @@ body.dark-mode .item-card:hover .view-details {
     height: 250px;
     border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 5px 15px rgb(0 0 0 / 10%);
 }
 
 body.dark-mode .category-card {
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 5px 15px rgb(0 0 0 / 30%);
 }
 
 .category-image {
@@ -194,14 +199,14 @@ body.dark-mode .category-card {
     bottom: 0;
     left: 0;
     right: 0;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+    background: linear-gradient(to top, rgb(0 0 0 / 80%), transparent);
     padding: 20px;
     color: white;
     transition: background 0.3s;
 }
 
 .category-card:hover .category-overlay {
-    background: linear-gradient(to top, rgba(26, 67, 20, 0.9), transparent);
+    background: linear-gradient(to top, rgb(26 67 20 / 90%), transparent);
 }
 
 .category-overlay h3 {
@@ -236,7 +241,7 @@ body.dark-mode .no-items {
 }
 
 /* Responsive adjustments */
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .items-grid {
         grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     }

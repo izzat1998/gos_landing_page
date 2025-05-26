@@ -1,8 +1,8 @@
 /* Base Styles */
 body {
     margin: 0;
-    font-family: 'Montserrat', sans-serif;
-    background-color: #FFFFFF;
+    font-family: Montserrat, sans-serif;
+    background-color: #FFF;
     color: #1A4314;
     min-height: 100vh;
     padding: 0;
@@ -22,11 +22,11 @@ body {
 /* Header and Navigation */
 header {
     width: 100%;
-    background-color: rgba(255, 255, 255, 0.98);
+    background-color: rgb(255 255 255 / 98%);
     position: sticky;
     top: 0;
     z-index: 1000;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 10px rgb(0 0 0 / 5%);
     padding: 15px 0;
     backdrop-filter: blur(10px);
 }
@@ -118,7 +118,7 @@ footer {
 
 .footer-section p, .footer-section a {
     margin: 5px 0;
-    color: rgba(255, 255, 255, 0.8);
+    color: rgb(255 255 255 / 80%);
     text-decoration: none;
     display: block;
     transition: color 0.3s;
@@ -132,13 +132,13 @@ footer {
     text-align: center;
     padding-top: 30px;
     margin-top: 30px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid rgb(255 255 255 / 10%);
     font-size: 0.9em;
-    color: rgba(255, 255, 255, 0.6);
+    color: rgb(255 255 255 / 60%);
 }
 
 /* Responsive adjustments */
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .nav-menu {
         display: none;
     }
