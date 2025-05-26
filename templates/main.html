@@ -1,402 +1,177 @@
-
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="ru">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GOS - Мебель на заказ</title>
-    <style>
-        body {
-            margin: 0;
-            font-family: 'Arial', sans-serif;
-            /* Выберите подходящий шрифт, можно Google Fonts */
-            background-color: #FFFFFF;
-            /* Белый фон */
-            color: #1A4314;
-            /* Темно-зеленый текст */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 20px;
-            box-sizing: border-box;
-            text-align: center;
-        }
+{% block title %}GOS - Мебель на заказ{% endblock %}
 
-        .logo-container img {
-            max-width: 180px;
-            /* Размер лого */
-            margin-bottom: 25px;
-        }
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/main.css' %}">
+{% endblock %}
 
-        h1 {
-            font-size: 2.2em;
-            /* Крупный заголовок */
-            margin-bottom: 10px;
-            font-weight: bold;
-            /* Можно попробовать шрифт с засечками, похожий на "GOS", если найдете подходящий веб-шрифт */
-        }
+{% block content %}
+    <!-- Catalog Section -->
+    <section class="catalog-section" id="catalog" aria-labelledby="catalog-title">
+        <div class="container">
+            <div class="section-title">
+                <h2 id="catalog-title">Наш каталог мебели</h2>
+                <p>Выберите категорию мебели, которая вас интересует</p>
+            </div>
+            <div class="categories-grid">
+                {% for category in categories %}
+                <article class="category-card">
+                    <a href="{% url 'category_detail' category.slug %}" class="category-link">
+                        {% if category.image %}
+                        <img src="{{ category.image.url }}" 
+                             alt="{{ category.name }}" 
+                             class="category-image"
+                             loading="lazy"
+                             width="400"
+                             height="300">
+                        {% else %}
+                        <img src="{% static 'images/furniture.png' %}" 
+                             alt="{{ category.name }}" 
+                             class="category-image"
+                             loading="lazy"
+                             width="400"
+                             height="300">
+                        {% endif %}
+                        <div class="category-overlay">
+                            <h3>{{ category.name }}</h3>
+                            <p>Просмотреть все товары</p>
+                            <span class="category-button">
+                                <i class="fas fa-arrow-right" aria-hidden="true"></i> 
+                                Подробнее
+                            </span>
+                        </div>
+                    </a>
+                </article>
+                {% empty %}
+                <div class="empty-catalog" role="alert">
+                    <p>Каталог пока пуст. Пожалуйста, загляните позже.</p>
+                    <a href="{% url 'catalog' %}" class="catalog-action-button">
+                        <i class="fas fa-th-large" aria-hidden="true"></i> 
+                        Перейти в каталог
+                    </a>
+                </div>
+                {% endfor %}
 
-        p.tagline {
-            font-size: 1.2em;
-            /* Подзаголовок/слоган */
-            margin-bottom: 30px;
-            opacity: 0.9;
-        }
+                {% if categories %}
+                <div class="catalog-action-container">
+                    <a href="{% url 'catalog' %}" class="catalog-action-button">
+                        <i class="fas fa-th-large" aria-hidden="true"></i> 
+                        Смотреть весь каталог
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
 
-        .cta-button,
-        .social-button {
-            display: inline-block;
-            background-color: #1A4314;
-            /* Темно-зеленая кнопка */
-            color: #FFFFFF;
-            /* Белый текст на кнопке */
-            padding: 18px 35px;
-            font-size: 1.3em;
-            font-weight: bold;
-            text-decoration: none;
-            border-radius: 50px;
-            /* Округлые края, как у символа в лого */
-            margin-bottom: 20px;
-            transition: transform 0.2s ease, background-color 0.2s ease;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            border: 2px solid #1A4314;
-            /* Белая рамка */
-        }
+    <!-- Benefits Section -->
+    <section class="benefits-section" id="benefits" aria-labelledby="benefits-title">
+        <div class="container">
+            <div class="section-title">
+                <h2 id="benefits-title">Почему выбирают нас</h2>
+                <p>Мы гарантируем качество и сроки изготовления мебели</p>
+            </div>
+            <div class="benefits-grid">
+                <article class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-clock" aria-hidden="true"></i>
+                    </div>
+                    <h3 class="benefit-title">Гарантия сроков</h3>
+                    <p class="benefit-description">Гарантируем сроки изготовления или компенсируем задержку мебелью в подарок.</p>
+                </article>
+                <article class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-truck" aria-hidden="true"></i>
+                    </div>
+                    <h3 class="benefit-title">Бесплатный замер</h3>
+                    <p class="benefit-description">Предоставляем бесплатный замер и доставку по Ташкенту и области.</p>
+                </article>
+                <article class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-medal" aria-hidden="true"></i>
+                    </div>
+                    <h3 class="benefit-title">Высокое качество</h3>
+                    <p class="benefit-description">Используем только высококачественные материалы и фурнитуру для нашей мебели.</p>
+                </article>
+                <article class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-pencil-ruler" aria-hidden="true"></i>
+                    </div>
+                    <h3 class="benefit-title">Индивидуальный дизайн</h3>
+                    <p class="benefit-description">Создаем уникальный дизайн мебели под ваши потребности и стиль интерьера.</p>
+                </article>
+            </div>
+        </div>
+    </section>
 
-        .social-button {
-            margin-left: 15px;
-            padding: 18px 25px;
-            background: linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D, #F56040, #F77737);
-            border: none;
-        }
+    <!-- Contact Section -->
+    <section class="contact-section" id="contact" aria-labelledby="contact-title">
+        <div class="container">
+            <div class="section-title">
+                <h2 id="contact-title">Свяжитесь с нами</h2>
+                <p>У вас есть вопросы? Мы с радостью на них ответим</p>
+            </div>
+            <div class="contact-info">
+                <article class="contact-card">
+                    <div class="contact-icon">
+                        <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+                    </div>
+                    <h3>Наш адрес</h3>
+                    <address>
+                        Ташкент, Узбекистан<br>
+                        ул. Примерная, 123
+                    </address>
+                </article>
+                <article class="contact-card">
+                    <div class="contact-icon">
+                        <i class="fas fa-phone-alt" aria-hidden="true"></i>
+                    </div>
+                    <h3>Телефон</h3>
+                    <p><a href="tel:+998903564334" class="contact-link">+998 90 356 43 34</a></p>
+                </article>
+                <article class="contact-card">
+                    <div class="contact-icon">
+                        <i class="fas fa-envelope" aria-hidden="true"></i>
+                    </div>
+                    <h3>Email</h3>
+                    <p><a href="mailto:info@gosmebel.uz" class="contact-link">info@gosmebel.uz</a></p>
+                </article>
+                <article class="contact-card">
+                    <div class="contact-icon">
+                        <i class="fab fa-instagram" aria-hidden="true"></i>
+                    </div>
+                    <h3>Instagram</h3>
+                    <p>
+                        <a href="https://www.instagram.com/gos.mebel.uz" 
+                           target="_blank" 
+                           rel="noopener noreferrer" 
+                           class="contact-link">
+                            @gos.mebel.uz
+                        </a>
+                    </p>
+                </article>
+            </div>
+            <div class="contact-cta">
+                <a href="tel:+998903564334" class="cta-button contact-cta-button">
+                    <i class="fas fa-phone-alt" aria-hidden="true"></i> 
+                    Позвонить нам
+                </a>
+                <a href="https://www.instagram.com/gos.mebel.uz" 
+                   target="_blank" 
+                   rel="noopener noreferrer" 
+                   class="social-button contact-social-button">
+                    <i class="fab fa-instagram" aria-hidden="true"></i> 
+                    Написать в Instagram
+                </a>
+            </div>
+        </div>
+    </section>
+{% endblock %}
 
-        .cta-button:hover {
-            transform: scale(1.05);
-            background-color: #265920;
-            /* Легкое изменение цвета при наведении */
-        }
-
-        .social-button:hover {
-            transform: scale(1.05);
-            filter: brightness(1.1);
-        }
-
-        .phone-link {
-            display: block;
-            /* Чтобы занимал всю ширину, если нужно */
-            font-size: 1.1em;
-            color: #1A4314;
-            text-decoration: none;
-            margin-top: 15px;
-            opacity: 0.8;
-        }
-
-        .phone-link:hover {
-            opacity: 1;
-            text-decoration: underline;
-        }
-
-        .benefits {
-            margin-top: 30px;
-            font-size: 0.95em;
-            line-height: 1.6;
-        }
-
-        .benefits ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .benefits li {
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            /* Центрируем иконку и текст */
-        }
-
-        .benefits li::before {
-            /* Используем псевдоэлемент для "галочки" или точки */
-            content: '✔';
-            /* Или '•' */
-            color: #1A4314;
-            /* Белая галочка/точка */
-            font-size: 1.2em;
-            margin-right: 10px;
-            font-weight: bold;
-        }
-
-        footer {
-            margin-top: 40px;
-            font-size: 0.8em;
-            opacity: 0.7;
-        }
-
-        .address {
-            margin-top: 30px;
-            padding: 15px;
-            border-top: 1px solid rgba(26, 67, 20, 0.2);
-            border-bottom: 1px solid rgba(26, 67, 20, 0.2);
-            font-size: 1em;
-            line-height: 1.5;
-        }
-
-        .address-title {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .kitchen-image {
-            margin: 30px 0;
-            max-width: 100%;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .image-container {
-            width: 100%;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        /* Dark mode toggle switch styles */
-        .theme-switch-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end; /* Align to the right */
-            padding: 10px;
-            position: fixed; /* Fixed position */
-            top: 10px; /* Distance from top */
-            right: 10px; /* Distance from right */
-            z-index: 1000; /* Ensure it's above other content */
-        }
-
-        .theme-switch {
-            display: inline-block;
-            height: 34px;
-            position: relative;
-            width: 60px;
-        }
-
-        .theme-switch input {
-            display: none;
-        }
-
-        .slider {
-            background-color: #ccc;
-            bottom: 0;
-            cursor: pointer;
-            left: 0;
-            position: absolute;
-            right: 0;
-            top: 0;
-            transition: .4s;
-            border-radius: 34px;
-        }
-
-        .slider:before {
-            background-color: #fff;
-            bottom: 4px;
-            content: "";
-            height: 26px;
-            left: 4px;
-            position: absolute;
-            transition: .4s;
-            width: 26px;
-            border-radius: 50%;
-        }
-
-        input:checked+.slider {
-            background-color: #1A4314; /* Dark green for active switch */
-        }
-
-        input:checked+.slider:before {
-            transform: translateX(26px);
-        }
-
-        /* Dark mode styles */
-        body.dark-mode {
-            background-color: #121212; /* Dark background */
-            color: #e0e0e0; /* Light text */
-        }
-
-        body.dark-mode .cta-button,
-        body.dark-mode .social-button {
-            background-color: #265920; /* Slightly lighter green for buttons in dark mode */
-            color: #e0e0e0;
-            border-color: #e0e0e0;
-        }
-        
-        body.dark-mode .cta-button:hover,
-        body.dark-mode .social-button:hover {
-            background-color: #1A4314;
-            filter: brightness(1.2);
-        }
-
-        body.dark-mode .phone-link {
-            color: #82d8ff; /* Light blue for links in dark mode */
-        }
-
-        body.dark-mode .benefits li::before {
-            color: #e0e0e0; /* Light color for checkmarks */
-        }
-
-        body.dark-mode .address {
-            border-top: 1px solid rgba(224, 224, 224, 0.2);
-            border-bottom: 1px solid rgba(224, 224, 224, 0.2);
-        }
-
-        body.dark-mode h1, 
-        body.dark-mode p.tagline,
-        body.dark-mode .address-title {
-            color: #e0e0e0;
-        }
-        body.dark-mode footer {
-            opacity: 0.8;
-        }
-
-    </style>
-</head>
-
-<body>
-    <div class="theme-switch-wrapper">
-        <label class="theme-switch" for="checkbox">
-            <input type="checkbox" id="checkbox" />
-            <div class="slider round"></div>
-        </label>
-    </div>
-
-    <div class="logo-container">
-        <!-- Вставьте ваш логотип сюда -->
-        <img src="{% static 'images/logo1.png' %}" alt="Логотип GOS Мебель">
-    </div>
-
-    <h1>Не успели вовремя? Мебель в подарок!</h1>
-    <p class="tagline">Гарантия сроков или компенсация – ваш выбор.</p>
-
-    <div class="image-container">
-        <img src="{% static 'images/image.png' %}" alt="Кухня на заказ" class="kitchen-image">
-    </div>
-
-    <div style="display: flex; justify-content: center; flex-wrap: wrap;">
-        <a href="tel:+998903564334" class="cta-button" id="cta-phone-button">
-            📞 Обсудить проект
-        </a>
-        <a href="https://www.instagram.com/gos.mebel.uz" target="_blank" class="social-button">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white"
-                style="vertical-align: middle; margin-right: 8px;">
-                <path
-                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
-            </svg>
-            Instagram
-        </a>
-    </div>
-    <p style="margin-bottom: 25px;">или</p>
-    <a href="tel:+998903564334" class.name = "phone-link" id="text-phone-link">Позвоните нам: +998 90 356 43 34</a>
-
-
-    <div class="benefits">
-        <ul>
-            <li>Индивидуальный дизайн-проект</li>
-            <li>Высококачественные материалы</li>
-            <li>Точные сроки изготовления</li>
-            <li>Бесплатная консультация и замер</li>
-        </ul>
-    </div>
-
-    <div class="address">
-        <div class="address-title">Адрес</div>
-        Ташкент, улица Буюк Ипак Йули, 233
-    </div>
-
-    <footer>
-        © 2023 GOS Мебельная Компания. Все права защищены.
-    </footer>
-
-    <script>
-        const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
-        const currentTheme = localStorage.getItem('theme');
-
-        if (currentTheme) {
-            document.body.classList.add(currentTheme);
-            if (currentTheme === 'dark-mode') {
-                toggleSwitch.checked = true;
-            }
-        }
-
-        function switchTheme(e) {
-            if (e.target.checked) {
-                document.body.classList.add('dark-mode');
-                localStorage.setItem('theme', 'dark-mode');
-            } else {
-                document.body.classList.remove('dark-mode');
-                localStorage.setItem('theme', 'light-mode');
-            }
-        }
-
-        toggleSwitch.addEventListener('change', switchTheme, false);
-    </script>
-
-    <script>
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-        const csrftoken = getCookie('csrftoken');
-        const visitId = "{{ visit_id|default:'' }}";
-
-        async function handlePhoneClick(event, phoneNumber) {
-            event.preventDefault();
-
-            if (visitId) {
-                try {
-                    const response = await fetch("{% url 'record_phone_click' %}", {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': csrftoken
-                        },
-                        body: JSON.stringify({ 'visit_id': visitId })
-                    });
-                    // Optional: handle response status or log errors
-                    if (!response.ok) {
-                        console.error('Failed to record phone click:', response.statusText);
-                    }
-                } catch (error) {
-                    console.error('Error recording phone click:', error);
-                }
-            }
-            window.location.href = 'tel:' + phoneNumber;
-        }
-
-        const ctaPhoneButton = document.getElementById('cta-phone-button');
-        if (ctaPhoneButton) {
-            ctaPhoneButton.addEventListener('click', function(event) {
-                handlePhoneClick(event, '+998903564334');
-            });
-        }
-
-        const textPhoneLink = document.getElementById('text-phone-link');
-        if (textPhoneLink) {
-            textPhoneLink.addEventListener('click', function(event) {
-                handlePhoneClick(event, '+998903564334');
-            });
-        }
-    </script>
-</body>
-
-</html>
+{% block extra_js %}
+<!-- Add hidden input with visit_id for JavaScript access -->
+<input type="hidden" id="visit-id-data" data-visit-id="{{ visit_id|default:'' }}">
+<script src="{% static 'js/phone-tracking.js' %}" defer></script>
+{% endblock %}

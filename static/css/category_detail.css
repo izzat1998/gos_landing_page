@@ -1,0 +1,334 @@
+/* Category Detail Page Specific Styles */
+
+/* Breadcrumbs */
+.breadcrumbs {
+    margin: 25px 0;
+    font-size: 0.9em;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.breadcrumbs a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: color 0.2s ease;
+    position: relative;
+}
+
+.breadcrumbs a:hover {
+    color: var(--primary-color-dark);
+}
+
+.breadcrumbs a:after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 1px;
+    bottom: -2px;
+    left: 0;
+    background-color: var(--primary-color);
+    transition: width 0.3s ease;
+}
+
+.breadcrumbs a:hover:after {
+    width: 100%;
+}
+
+body.dark-mode .breadcrumbs a {
+    color: var(--primary-color-light);
+}
+
+.breadcrumbs span {
+    margin: 0 8px;
+    color: var(--text-color-secondary);
+}
+
+.breadcrumbs .current-page {
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+body.dark-mode .breadcrumbs span {
+    color: var(--text-color-secondary);
+}
+
+/* Page Title */
+.page-title {
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.page-title h1 {
+    font-size: 2.5em;
+    margin-bottom: 15px;
+    color: var(--primary-color);
+    position: relative;
+    display: inline-block;
+}
+
+.page-title h1:after {
+    content: '';
+    position: absolute;
+    width: 60px;
+    height: 3px;
+    background-color: var(--primary-color);
+    bottom: -8px;
+    left: 0;
+}
+
+.category-description {
+    font-size: 1.2em;
+    line-height: 1.6;
+    color: var(--text-color-secondary);
+    max-width: 800px;
+    margin-bottom: 20px;
+}
+
+.category-stats {
+    margin-top: 15px;
+    font-size: 0.95em;
+    color: var(--text-color-secondary);
+}
+
+.item-count {
+    background-color: rgba(var(--primary-color-rgb), 0.1);
+    padding: 5px 12px;
+    border-radius: 20px;
+    display: inline-block;
+}
+
+/* Items Grid */
+.items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+    margin-bottom: 50px;
+}
+
+.item-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    height: 100%;
+}
+
+.item-card {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    background-color: var(--card-bg);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+body.dark-mode .item-card {
+    background-color: var(--card-bg);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+}
+
+.item-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+}
+
+.item-image-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.item-image {
+    height: 250px;
+    width: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.item-card:hover .item-image {
+    transform: scale(1.05);
+}
+
+.discount-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background-color: var(--danger);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 0.85em;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.item-info {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    justify-content: space-between;
+}
+
+.item-title {
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-size: 1.3em;
+    color: var(--text-color);
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.item-description {
+    margin: 0 0 15px 0;
+    color: var(--text-color-secondary);
+    font-size: 0.95em;
+    line-height: 1.5;
+}
+
+body.dark-mode .item-info p {
+    color: var(--text-color-secondary);
+}
+
+.item-price {
+    margin-top: auto;
+    padding-top: 15px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+}
+
+.current-price {
+    font-weight: bold;
+    font-size: 1.3em;
+    color: var(--primary-color);
+}
+
+.original-price {
+    color: var(--danger);
+    margin-left: 10px;
+    text-decoration: line-through;
+    font-size: 0.9em;
+    opacity: 0.8;
+}
+
+.inquiry-price {
+    font-style: italic;
+    color: var(--text-color-secondary);
+}
+
+.item-action {
+    margin-top: 15px;
+    text-align: right;
+}
+
+.view-details {
+    color: var(--primary-color);
+    font-weight: 500;
+    font-size: 0.95em;
+    display: inline-flex;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.view-details i {
+    margin-left: 5px;
+    font-size: 0.85em;
+    transition: transform 0.3s ease;
+}
+
+.item-card:hover .view-details {
+    color: var(--primary-color-dark);
+}
+
+.item-card:hover .view-details i {
+    transform: translateX(3px);
+}
+
+/* No Items */
+.no-items {
+    text-align: center;
+    padding: 60px 30px;
+    color: var(--text-color-secondary);
+    background-color: var(--light-bg);
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    margin: 30px 0;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.no-items-icon {
+    font-size: 3em;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    opacity: 0.7;
+}
+
+.no-items h3 {
+    font-size: 1.5em;
+    color: var(--text-color);
+    margin-bottom: 15px;
+}
+
+.no-items p {
+    font-size: 1.1em;
+    margin-bottom: 25px;
+    line-height: 1.6;
+}
+
+.no-items .catalog-action-button {
+    display: inline-block;
+    margin-top: 10px;
+}
+
+body.dark-mode .no-items {
+    background-color: var(--card-bg);
+    color: var(--text-color-secondary);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .items-grid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 25px;
+    }
+    
+    .page-title h1 {
+        font-size: 2.2em;
+    }
+}
+
+@media (max-width: 768px) {
+    .items-grid {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 20px;
+    }
+    
+    .page-title h1 {
+        font-size: 2em;
+    }
+    
+    .page-title p {
+        font-size: 1.1em;
+    }
+}
+
+@media (max-width: 576px) {
+    .items-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .breadcrumbs {
+        font-size: 0.8em;
+    }
+    
+    .page-title h1 {
+        font-size: 1.8em;
+    }
+}

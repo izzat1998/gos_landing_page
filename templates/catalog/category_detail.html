@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ category.name }} - GOS Мебель{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/category_detail.css' %}">
+
+{% endblock %}
+
+{% block content %}
+    
+    <div class="container">
+        <!-- Breadcrumbs Navigation -->
+        <div class="breadcrumbs">
+            <a href="{% url 'main_page' %}">Главная</a>
+            <span>›</span>
+            <a href="{% url 'catalog' %}">Каталог</a>
+            <span>›</span>
+            <span class="current-page">{{ category.name }}</span>
+        </div>
+
+        <!-- Category Header -->
+        <div class="page-title">
+            <h1>{{ category.name }}</h1>
+            {% if category.description %}
+            <p class="category-description">{{ category.description }}</p>
+            {% endif %}
+            <div class="category-stats">
+                <span class="item-count">{{ items|length }} товаров</span>
+            </div>
+        </div>
+
+        {% if items %}
+        <div class="items-grid">
+            {% for item in items %}
+            <a href="{% url 'furniture_detail' category.slug item.slug %}" class="item-link">
+                <div class="item-card">
+                    <div class="item-image-container">
+                        <img src="{{ item.main_image.url }}" alt="{{ item.name }}" class="item-image">
+                        {% if item.discount_price %}
+                        <span class="discount-badge">-{{ item.get_discount_percentage|default:"" }}%</span>
+                        {% endif %}
+                    </div>
+                    <div class="item-info">
+                        <h3 class="item-title">{{ item.name }}</h3>
+                        <p class="item-description">{{ item.description|truncatechars:80 }}</p>
+                        <div class="item-price">
+                            {% if item.discount_price %}
+                            <span class="current-price">{{ item.discount_price }} сум</span>
+                            <span class="original-price">{{ item.price }} сум</span>
+                            {% elif item.price %}
+                            <span class="current-price">{{ item.price }} сум</span>
+                            {% else %}
+                            <span class="inquiry-price">Цена по запросу</span>
+                            {% endif %}
+                        </div>
+                        <div class="item-action">
+                            <span class="view-details">Подробнее <i class="fas fa-arrow-right"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="no-items">
+            <i class="fas fa-box-open no-items-icon"></i>
+            <h3>Товары не найдены</h3>
+            <p>В данной категории пока нет товаров. Пожалуйста, посетите страницу позже или выберите другую категорию.</p>
+            <a href="{% url 'catalog' %}" class="catalog-action-button"><i class="fas fa-th-large"></i> Вернуться в каталог</a>
+        </div>
+        {% endif %}
+    </div>
+
+{% endblock %}

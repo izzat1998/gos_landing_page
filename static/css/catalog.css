@@ -1,0 +1,247 @@
+/* Catalog Page Specific Styles */
+
+/* Breadcrumbs */
+.breadcrumbs {
+    margin-bottom: 20px;
+    font-size: 0.9em;
+}
+
+.breadcrumbs a {
+    color: #1A4314;
+    text-decoration: none;
+}
+
+body.dark-mode .breadcrumbs a {
+    color: #8be67c;
+}
+
+.breadcrumbs span {
+    margin: 0 8px;
+    color: #666;
+}
+
+body.dark-mode .breadcrumbs span {
+    color: #999;
+}
+
+/* Page Title */
+.page-title {
+    margin-bottom: 40px;
+}
+
+.page-title h1 {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+}
+
+.page-title p {
+    font-size: 1.2em;
+    opacity: 0.8;
+    line-height: 1.6;
+}
+
+/* Featured Items */
+.featured-items {
+    margin-bottom: 50px;
+}
+
+.featured-items h2 {
+    font-size: 2em;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+}
+
+/* Items Grid */
+.items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+    margin-bottom: 50px;
+}
+
+.item-card {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    background-color: #fff;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+body.dark-mode .item-card {
+    background-color: #1e1e1e;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.item-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.item-image {
+    height: 200px;
+    width: 100%;
+    object-fit: cover;
+}
+
+.item-info {
+    padding: 15px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.item-info h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+}
+
+.item-info p {
+    margin: 5px 0;
+    color: #444;
+}
+
+body.dark-mode .item-info p {
+    color: #bbb;
+}
+
+.item-price {
+    font-weight: bold;
+    font-size: 1.2em;
+    color: #1A4314;
+    margin-top: 10px;
+}
+
+body.dark-mode .item-price {
+    color: #8be67c;
+}
+
+.discount-price {
+    color: #e74c3c;
+    margin-left: 10px;
+    text-decoration: line-through;
+    font-size: 0.9em;
+}
+
+.view-details {
+    display: inline-block;
+    margin-top: auto;
+    padding-top: 10px;
+    color: #1A4314;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+body.dark-mode .view-details {
+    color: #8be67c;
+}
+
+.item-card:hover .view-details {
+    color: #265920;
+}
+
+body.dark-mode .item-card:hover .view-details {
+    color: #a0f092;
+}
+
+/* Categories Section */
+.categories-section {
+    padding: 40px 0;
+}
+
+.categories-section h2 {
+    font-size: 2em;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+}
+
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+.category-card {
+    position: relative;
+    height: 250px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+body.dark-mode .category-card {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.category-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.category-card:hover .category-image {
+    transform: scale(1.1);
+}
+
+.category-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+    padding: 20px;
+    color: white;
+    transition: background 0.3s;
+}
+
+.category-card:hover .category-overlay {
+    background: linear-gradient(to top, rgba(26, 67, 20, 0.9), transparent);
+}
+
+.category-overlay h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.category-button {
+    display: inline-block;
+    margin-top: 10px;
+    font-weight: 500;
+    transition: transform 0.3s;
+}
+
+.category-card:hover .category-button {
+    transform: translateX(5px);
+}
+
+/* No Items */
+.no-items {
+    text-align: center;
+    padding: 50px;
+    font-size: 1.2em;
+    color: #666;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+}
+
+body.dark-mode .no-items {
+    background-color: #1e1e1e;
+    color: #bbb;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .items-grid {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    }
+    
+    .categories-grid {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    }
+}

@@ -7,7 +7,10 @@ from .views import (
     LocationVisitView,
     LocationQRCodeListView,
     LocationStatsAPIView,
-    RecordPhoneClickView
+    RecordPhoneClickView,
+    CatalogView,
+    CategoryDetailView,
+    FurnitureDetailView
 )
 
 urlpatterns = [
@@ -18,4 +21,9 @@ urlpatterns = [
     path("api/location-stats/", LocationStatsAPIView.as_view(), name="location_stats_api"),
     path("api/token/", obtain_auth_token, name="api_token"),
     path('api/record-phone-click/', RecordPhoneClickView.as_view(), name='record_phone_click'),
+    
+    # Furniture catalog URLs
+    path('catalog/', CatalogView.as_view(), name='catalog'),
+    path('catalog/<slug:category_slug>/', CategoryDetailView.as_view(), name='category_detail'),
+    path('catalog/<slug:category_slug>/<slug:item_slug>/', FurnitureDetailView.as_view(), name='furniture_detail'),
 ]

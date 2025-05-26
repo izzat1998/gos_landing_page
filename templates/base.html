@@ -1,0 +1,99 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="GOS Мебель - производство качественной мебели на заказ в Ташкенте">
+    <meta name="keywords" content="мебель, Ташкент, GOS Мебель, мебель на заказ">
+    <meta name="author" content="GOS Мебель">
+    <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
+    <title>{% block title %}GOS Мебель{% endblock %}</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Core CSS -->
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+    
+    <!-- Page-specific CSS -->
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Header -->
+    <header role="banner">
+        <div class="container">
+            <div class="header-content">
+                <a href="{% url 'main_page' %}" class="logo-container" aria-label="На главную">
+                    <img src="{% static 'images/logo1.png' %}" alt="Логотип GOS Мебель" width="150" height="50">
+                </a>
+                <nav class="nav-menu" role="navigation" aria-label="Главное меню">
+                    <a href="{% url 'main_page' %}" aria-current="{% if request.path == '/' %}page{% endif %}">Главная</a>
+                    <a href="{% url 'catalog' %}" aria-current="{% if 'catalog' in request.path %}page{% endif %}">Каталог</a>
+                    <a href="{% url 'main_page' %}#benefits">О нас</a>
+                    <a href="#contact">Контакты</a>
+                    <!-- Theme Switch -->
+                    <div class="theme-switch-wrapper">
+                        <label class="theme-switch" for="theme-checkbox">
+                            <input type="checkbox" id="theme-checkbox" aria-label="Переключить тему" />
+                            <div class="slider round"></div>
+                        </label>
+                    </div>
+                </nav>
+                <button class="mobile-menu-btn" aria-label="Открыть меню" aria-expanded="false">
+                    <i class="fas fa-bars" aria-hidden="true"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main role="main">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer role="contentinfo">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>О компании</h3>
+                    <p>GOS Мебель - производство качественной мебели на заказ в Ташкенте. Мы гарантируем сроки или компенсируем стоимость.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Контакты</h3>
+                    <address>
+                        <p><i class="fas fa-map-marker-alt" aria-hidden="true"></i> Ташкент, Узбекистан</p>
+                        <p><i class="fas fa-phone" aria-hidden="true"></i> <a href="tel:+998903564334">+998 90 356 43 34</a></p>
+                        <p><i class="fas fa-envelope" aria-hidden="true"></i> <a href="mailto:info@gosmebel.uz">info@gosmebel.uz</a></p>
+                    </address>
+                </div>
+                <div class="footer-section">
+                    <h3>Навигация</h3>
+                    <nav aria-label="Футер навигация">
+                        <a href="{% url 'main_page' %}">Главная</a>
+                        <a href="{% url 'catalog' %}">Каталог</a>
+                        <a href="{% url 'main_page' %}#benefits">О нас</a>
+                        <a href="#contact">Контакты</a>
+                    </nav>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; {% now "Y" %} GOS Мебель. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Core JavaScript -->
+    <script src="{% static 'js/theme.js' %}" defer></script>
+    
+    <!-- Page-specific JavaScript -->
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

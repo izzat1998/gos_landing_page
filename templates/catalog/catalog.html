@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}GOS - Каталог мебели{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/catalog.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <section class="page-title" aria-labelledby="page-title">
+        <h1 id="page-title">Каталог мебели</h1>
+        <p>Выберите категорию или изучите наши лучшие предложения</p>
+    </section>
+
+    {% if featured_items %}
+    <section class="featured-items" aria-labelledby="featured-title">
+        <h2 id="featured-title">
+            <i class="fas fa-star" aria-hidden="true" style="color: #FFD700; margin-right: 10px;"></i>
+            Рекомендуемые товары
+        </h2>
+        <div class="items-grid">
+            {% for item in featured_items %}
+            <article class="item-card">
+                <a href="{% url 'furniture_detail' item.category.slug item.slug %}" class="item-link">
+                    <div class="featured-badge" aria-label="Рекомендуемый товар">Топ</div>
+                    <img src="{{ item.main_image.url }}" 
+                         alt="{{ item.name }}" 
+                         class="item-image"
+                         loading="lazy"
+                         width="300"
+                         height="200">
+                    <div class="item-info">
+                        <h3>{{ item.name }}</h3>
+                        <p>{{ item.description|truncatechars:100 }}</p>
+                        <div class="item-price">
+                            <div class="price-tag">
+                                {% if item.discount_price %}
+                                <span class="current-price">{{ item.discount_price }} сум</span>
+                                <span class="original-price">{{ item.price }} сум</span>
+                                {% elif item.price %}
+                                <span class="current-price">{{ item.price }} сум</span>
+                                {% else %}
+                                <span class="price-request">Цена по запросу</span>
+                                {% endif %}
+                            </div>
+                            <span class="view-details">Подробнее</span>
+                        </div>
+                    </div>
+                </a>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <section class="categories-section" aria-labelledby="categories-title">
+        <h2 id="categories-title">
+            <i class="fas fa-th-large" aria-hidden="true" style="color: #1A4314; margin-right: 10px;"></i>
+            Категории мебели
+        </h2>
+        <div class="categories-grid">
+            {% for category in categories %}
+            <article class="category-card">
+                <a href="{% url 'category_detail' category.slug %}" class="category-link">
+                    {% if category.image %}
+                    <img src="{{ category.image.url }}" 
+                         alt="{{ category.name }}" 
+                         class="category-image"
+                         loading="lazy"
+                         width="400"
+                         height="300">
+                    {% else %}
+                    <img src="{% static 'images/furniture.png' %}" 
+                         alt="{{ category.name }}" 
+                         class="category-image"
+                         loading="lazy"
+                         width="400"
+                         height="300">
+                    {% endif %}
+                    <div class="category-overlay">
+                        <h3>{{ category.name }}</h3>
+                        {% if category.description %}
+                        <p>{{ category.description|truncatechars:60 }}</p>
+                        {% endif %}
+                        <span class="category-button">
+                            Посмотреть 
+                            <i class="fas fa-arrow-right" aria-hidden="true" style="margin-left: 5px;"></i>
+                        </span>
+                    </div>
+                </a>
+            </article>
+            {% empty %}
+            <div class="empty-categories" role="alert">
+                <i class="fas fa-info-circle" aria-hidden="true" style="font-size: 2em; margin-bottom: 15px; color: #1A4314;"></i>
+                <p>Категории пока не добавлены. Пожалуйста, посетите страницу позже.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+{% endblock %}

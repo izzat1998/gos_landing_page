@@ -8,7 +8,7 @@ import datetime
 import qrcode
 from io import BytesIO
 
-from .models import Location, QRCodeScan, PhoneClick
+from .models import Location, QRCodeScan, PhoneClick, FurnitureCategory, FurnitureItem
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -24,6 +24,9 @@ class LandingPageView(TemplateView):
         visit_id = self.request.GET.get('visit_id')
         if visit_id:
             context['visit_id'] = visit_id
+            
+        # Add furniture categories to the context
+        context['categories'] = FurnitureCategory.objects.filter(is_active=True).order_by('order', 'name')[:4]
         return context
 
 
@@ -127,3 +130,47 @@ class RecordPhoneClickView(APIView):
                 {"error": "An unexpected error occurred: " + str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+
+class CatalogView(ListView):
+    model = FurnitureCategory
+    template_name = 'catalog/catalog.html'
+    context_object_name = 'categories'
+
+    def get_queryset(self):
+        return FurnitureCategory.objects.filter(is_active=True).order_by('order', 'name')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['featured_items'] = FurnitureItem.objects.filter(is_featured=True, is_active=True)[:6]
+        return context
+
+
+class CategoryDetailView(DetailView):
+    model = FurnitureCategory
+    template_name = 'catalog/category_detail.html'
+    context_object_name = 'category'
+    slug_url_kwarg = 'category_slug'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        category = self.get_object()
+        context['items'] = FurnitureItem.objects.filter(category=category, is_active=True)
+        return context
+
+
+class FurnitureDetailView(DetailView):
+    model = FurnitureItem
+    template_name = 'catalog/furniture_detail.html'
+    context_object_name = 'item'
+    slug_url_kwarg = 'item_slug'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        item = self.get_object()
+        context['images'] = item.images.all().order_by('order')
+        context['related_items'] = FurnitureItem.objects.filter(
+            category=item.category, 
+            is_active=True
+        ).exclude(id=item.id)[:4]
+        return context

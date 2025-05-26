@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ item.name }} - GOS Мебель{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/furniture_detail.css' %}">
+{% endblock %}
+
+{% block content %}
+    
+    <div class="container">
+        <!-- Breadcrumbs Navigation -->
+        <div class="breadcrumbs">
+            <a href="{% url 'main_page' %}">Главная</a>
+            <span>›</span>
+            <a href="{% url 'catalog' %}">Каталог</a>
+            <span>›</span>
+            <a href="{% url 'category_detail' item.category.slug %}">{{ item.category.name }}</a>
+            <span>›</span>
+            <span class="current-page">{{ item.name }}</span>
+        </div>
+
+        <!-- Product Detail Section -->
+        <div class="product-detail">
+            <!-- Product Images Gallery -->
+            <div class="product-images">
+                <div class="main-image-container">
+                    {% if item.discount_price %}
+                    <span class="discount-badge">-{{ item.get_discount_percentage|default:"" }}%</span>
+                    {% endif %}
+                    <img src="{{ item.main_image.url }}" alt="{{ item.name }}" class="main-image" id="main-product-image">
+                </div>
+                
+                {% if images %}
+                <div class="image-gallery">
+                    <img src="{{ item.main_image.url }}" alt="{{ item.name }}" class="gallery-thumbnail active" data-src="{{ item.main_image.url }}">
+                    {% for image in images %}
+                    <img src="{{ image.image.url }}" alt="{{ image.alt_text|default:item.name }}" class="gallery-thumbnail" data-src="{{ image.image.url }}">
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Product Information -->
+            <div class="product-info">
+                <h1 class="product-title">{{ item.name }}</h1>
+                
+                <!-- Product Pricing -->
+                <div class="product-price-container">
+                    {% if item.discount_price %}
+                    <div class="price-group">
+                        <span class="current-price">{{ item.discount_price }} сум</span>
+                        <span class="original-price">{{ item.price }} сум</span>
+                        <span class="discount-percent">-{{ item.get_discount_percentage|default:"" }}%</span>
+                    </div>
+                    {% elif item.price %}
+                    <span class="current-price">{{ item.price }} сум</span>
+                    {% else %}
+                    <span class="inquiry-price">Цена по запросу</span>
+                    {% endif %}
+                </div>
+                
+                <!-- Product Description -->
+                <div class="product-description">
+                    <h3 class="section-title">Описание</h3>
+                    <div class="description-content">
+                        {{ item.description|linebreaks }}
+                    </div>
+                </div>
+                
+                <!-- Product Specifications -->
+                <div class="product-specs">
+                    <h3 class="section-title">Характеристики</h3>
+                    <ul class="specs-list">
+                        {% if item.dimensions %}
+                        <li class="spec-item">
+                            <span class="spec-label">Размеры:</span>
+                            <span class="spec-value">{{ item.dimensions }}</span>
+                        </li>
+                        {% endif %}
+                        
+                        {% if item.materials %}
+                        <li class="spec-item">
+                            <span class="spec-label">Материалы:</span>
+                            <span class="spec-value">{{ item.materials }}</span>
+                        </li>
+                        {% endif %}
+                        
+                        <li class="spec-item">
+                            <span class="spec-label">Категория:</span>
+                            <span class="spec-value">{{ item.category.name }}</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Call to Action Buttons -->
+                <div class="product-actions">
+                    <a href="tel:+998903564334" class="action-button primary-button"><i class="fas fa-phone-alt"></i> Обсудить заказ</a>
+                    <a href="https://wa.me/998903564334?text=Здравствуйте! Меня интересует {{ item.name }}" target="_blank" class="action-button secondary-button"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                </div>
+            </div>
+        </div>
+
+        {% if related_items %}
+        <!-- Related Products Section -->
+        <div class="related-products">
+            <h2 class="section-heading">Похожие товары</h2>
+            <div class="related-grid">
+                {% for related in related_items %}
+                <a href="{% url 'furniture_detail' related.category.slug related.slug %}" class="related-link">
+                    <div class="related-item">
+                        <div class="related-image-container">
+                            <img src="{{ related.main_image.url }}" alt="{{ related.name }}" class="related-image">
+                            {% if related.discount_price %}
+                            <span class="discount-badge small">-{{ related.get_discount_percentage|default:"" }}%</span>
+                            {% endif %}
+                        </div>
+                        <div class="related-info">
+                            <h3 class="related-title">{{ related.name }}</h3>
+                            <div class="related-price">
+                                {% if related.discount_price %}
+                                <span class="current-price">{{ related.discount_price }} сум</span>
+                                <span class="original-price">{{ related.price }} сум</span>
+                                {% elif related.price %}
+                                <span class="current-price">{{ related.price }} сум</span>
+                                {% else %}
+                                <span class="inquiry-price">Цена по запросу</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/furniture_detail.js' %}"></script>
+{% endblock %}
