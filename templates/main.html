@@ -36,10 +36,8 @@
                         {% endif %}
                         <div class="category-overlay">
                             <h3>{{ category.name }}</h3>
-                            <p>Просмотреть все товары</p>
-                            <span class="category-button">
-                                <i class="fas fa-arrow-right" aria-hidden="true"></i> 
-                                Подробнее
+                            <span class="btn btn-text">
+                                Просмотреть <i class="fas fa-arrow-right" aria-hidden="true"></i>
                             </span>
                         </div>
                     </a>
@@ -47,18 +45,16 @@
                 {% empty %}
                 <div class="empty-catalog" role="alert">
                     <p>Каталог пока пуст. Пожалуйста, загляните позже.</p>
-                    <a href="{% url 'catalog' %}" class="catalog-action-button">
-                        <i class="fas fa-th-large" aria-hidden="true"></i> 
-                        Перейти в каталог
+                    <a href="{% url 'catalog' %}" class="btn btn-primary">
+                        <i class="fas fa-th-large" aria-hidden="true"></i> Перейти в каталог
                     </a>
                 </div>
                 {% endfor %}
 
                 {% if categories %}
                 <div class="catalog-action-container">
-                    <a href="{% url 'catalog' %}" class="catalog-action-button">
-                        <i class="fas fa-th-large" aria-hidden="true"></i> 
-                        Смотреть весь каталог
+                    <a href="{% url 'catalog' %}" class="btn btn-primary">
+                        <i class="fas fa-th-large" aria-hidden="true"></i> Смотреть весь каталог
                     </a>
                 </div>
                 {% endif %}
@@ -154,16 +150,14 @@
                 </article>
             </div>
             <div class="contact-cta">
-                <a href="tel:+998903564334" class="cta-button contact-cta-button">
-                    <i class="fas fa-phone-alt" aria-hidden="true"></i> 
-                    Позвонить нам
+                <a href="tel:+998903564334" class="btn btn-primary">
+                    <i class="fas fa-phone-alt" aria-hidden="true"></i> Позвонить нам
                 </a>
                 <a href="https://www.instagram.com/gos.mebel.uz" 
                    target="_blank" 
                    rel="noopener noreferrer" 
-                   class="social-button contact-social-button">
-                    <i class="fab fa-instagram" aria-hidden="true"></i> 
-                    Написать в Instagram
+                   class="btn btn-secondary">
+                    <i class="fab fa-instagram" aria-hidden="true"></i> Написать в Instagram
                 </a>
             </div>
         </div>
