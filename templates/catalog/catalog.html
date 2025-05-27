@@ -45,7 +45,7 @@
                                 <span class="price-request">Цена по запросу</span>
                                 {% endif %}
                             </div>
-                            <span class="view-details">Подробнее</span>
+                            <span class="btn btn-text">Подробнее <i class="fas fa-arrow-right"></i></span>
                         </div>
                     </div>
                 </a>
@@ -84,9 +84,8 @@
                         {% if category.description %}
                         <p>{{ category.description|truncatechars:60 }}</p>
                         {% endif %}
-                        <span class="category-button">
-                            Посмотреть 
-                            <i class="fas fa-arrow-right" aria-hidden="true" style="margin-left: 5px;"></i>
+                        <span class="btn btn-text">
+                            Посмотреть <i class="fas fa-arrow-right" aria-hidden="true"></i>
                         </span>
                     </div>
                 </a>
