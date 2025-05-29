@@ -18,7 +18,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         dry_run = options.get("dry_run", False)
-        
+
         # Get the kitchen category
         try:
             kitchen_category = FurnitureCategory.objects.get(name="Кухни")
@@ -38,7 +38,7 @@ class Command(BaseCommand):
         # Update furniture names
         if dry_run:
             self.stdout.write(self.style.WARNING("DRY RUN - No changes will be made"))
-            
+
         self.update_furniture_names(kitchen_category, name_mapping, dry_run)
 
     def get_name_mapping(self):
@@ -93,9 +93,9 @@ class Command(BaseCommand):
             "kuhnya1": "Престиж Лайн",
             "Кухня 1": "Бейсик Беж",
             "kuhnya3": "Контраст Стоун",
-            "Кухни 3": "Модерн Графит"
+            "Кухни 3": "Модерн Графит",
         }
-        
+
         return mapping
 
     @transaction.atomic
@@ -103,42 +103,58 @@ class Command(BaseCommand):
         """Update furniture names for items in the kitchen category."""
         # Get all furniture items in the kitchen category
         kitchen_items = FurnitureItem.objects.filter(category=kitchen_category)
-        
+
         updated_count = 0
         not_found_ids = set()
-        
+
         # First pass: try exact matches on IDs/names
         for old_id, new_name in name_mapping.items():
             # Try to find items with exact name match
             matching_items = kitchen_items.filter(name=old_id)
-            
+
             # If no exact match, try to find items containing the ID
             if not matching_items.exists():
                 matching_items = kitchen_items.filter(name__contains=old_id)
-            
+
             if matching_items.exists():
                 for item in matching_items:
                     old_name = item.name
                     if not dry_run:
                         item.name = new_name
-                        # Generate a new slug based on the new name
-                        item.slug = None  # Will be auto-generated on save
+                        # Generate a unique slug based on the new name
+                        from django.db.models import Q
+                        from django.utils.text import slugify
+
+                        # Create a base slug from the new name
+                        base_slug = slugify(new_name)
+                        slug = base_slug
+
+                        # Check if the slug already exists for another item
+                        counter = 1
+                        while FurnitureItem.objects.filter(
+                            ~Q(pk=item.pk),  # Exclude current item
+                            slug=slug,
+                        ).exists():
+                            slug = f"{base_slug}-{counter}"
+                            counter += 1
+
+                        item.slug = slug
                         item.save()
-                    
+
                     self.stdout.write(
                         f"{'Would update' if dry_run else 'Updated'}: {old_name} → {new_name}"
                     )
                     updated_count += 1
             else:
                 not_found_ids.add(old_id)
-        
+
         # Summary
         self.stdout.write(
             self.style.SUCCESS(
                 f"{'Would update' if dry_run else 'Updated'} {updated_count} furniture items"
             )
         )
-        
+
         if not_found_ids:
             self.stdout.write(
                 self.style.WARNING(
