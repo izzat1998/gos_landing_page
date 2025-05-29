@@ -300,7 +300,6 @@ class QRStatsBot:
             user = update.effective_user
             today = timezone.now().date()
             start = today - _dt.timedelta(days=days)
-            date_range = f"{start.strftime('%d.%m.%Y')} — {today.strftime('%d.%m.%Y')}"
 
             get_locations = sync_to_async(self._get_locations)
             count_scans = sync_to_async(self._count_scans)
@@ -318,7 +317,9 @@ class QRStatsBot:
                 total_phone_clicks_overall = 0
                 try:
                     for loc in locations:
-                        total_phone_clicks_overall += await count_location_phone_clicks(loc.id, start)
+                        total_phone_clicks_overall += await count_location_phone_clicks(
+                            loc.id, start
+                        )
                 except Exception as e:
                     logger.error(f"Error counting admin phone clicks: {str(e)}")
                     logger.error(traceback.format_exc())
@@ -350,55 +351,57 @@ class QRStatsBot:
                         loc.id, start
                     )
 
-            # Header
+            # Header - Simplified period text
             if days == 0:
                 period_text = "сегодня"
             elif days == 1:
-                period_text = "за вчера"
+                period_text = "вчера"
             elif days == 7:
-                period_text = "за неделю"
+                period_text = "за 7 дней"
             elif days == 30:
-                period_text = "за месяц"
+                period_text = "за 30 дней"
             else:
                 period_text = f"за {days} дней"
 
-            parts = [
-                f"📊 *СТАТИСТИКА {period_text.upper()}*",
-                f"Период: {date_range}",
-                f"━━━━━━━━━━━━━━━━━━━━━",
-                f"📈 *Общее количество сканирований: {total_scans}*",
-                f"📱 *Общее количество кликов на телефон: {total_phone_clicks_overall}*",
-            ]
-            
+            # Create a simplified message
+            parts = [f"📊 *Статистика {period_text}*"]
+
+            # Add overall statistics
+            parts.append(f"\n📈 Сканирований: *{total_scans}*")
+            parts.append(f"📱 Звонков: *{total_phone_clicks_overall}*")
+
             # Add conversion rate if there are scans
             if total_scans > 0:
                 conversion_rate = (total_phone_clicks_overall / total_scans) * 100
-                parts.append(f"📊 *Конверсия сканирований в звонки: {conversion_rate:.1f}%*")
+                parts.append(f"🔄 Конверсия: *{conversion_rate:.1f}%*")
 
-            if (
-                total_scans > 0 or total_phone_clicks_overall > 0
-            ):  # Show stats if there's any activity
-                parts.append("\n🗺️ *СТАТИСТИКА ПО ЛОКАЦИЯМ:*")
+            # Only show location stats if there's activity
+            if total_scans > 0 or total_phone_clicks_overall > 0:
+                parts.append("\n📍 *Локации:*")
+
+                # Prepare location stats
                 loc_stats = []
                 for loc in locations:
                     loc_scans = await count_location_scans(loc.id, start)
                     loc_phone_clicks = await count_location_phone_clicks(loc.id, start)
-                    share = (loc_scans / total_scans * 100) if total_scans > 0 else 0
-                    loc_stats.append((loc.name, loc_scans, loc_phone_clicks, share))
+                    # Only include locations with activity
+                    if loc_scans > 0 or loc_phone_clicks > 0:
+                        loc_stats.append((loc.name, loc_scans, loc_phone_clicks))
 
-                # Sort by total scans primarily, then by phone clicks
-                loc_stats.sort(key=lambda x: (x[1], x[2]), reverse=True)
+                # Sort by total scans (most active first)
+                loc_stats.sort(key=lambda x: x[1], reverse=True)
 
-                for i, (name, scans, phone_clicks, share) in enumerate(loc_stats, 1):
-                    bar = (
-                        "■" * max(1, round(share / 10)) if total_scans > 0 else ""
-                    )  # Ensure bar is not generated if no scans
-                    
+                # Display each location with simple stats
+                for i, (name, scans, phone_clicks) in enumerate(loc_stats, 1):
                     # Calculate location-specific conversion rate
-                    loc_conversion = (phone_clicks / scans * 100) if scans > 0 else 0
-                    
+                    loc_conversion = (
+                        f", конверсия {(phone_clicks / scans * 100):.1f}%"
+                        if scans > 0
+                        else ""
+                    )
+
                     parts.append(
-                        f"{i}. *{name}*: 📞 {phone_clicks} / 📷 {scans} ({share:.1f}%)\n   {bar if bar else ''}\n   Конверсия: {loc_conversion:.1f}%"
+                        f"{i}. *{name}*: {scans} 📷 → {phone_clicks} 📞{loc_conversion}"
                     )
 
             msg = "\n".join(parts)
