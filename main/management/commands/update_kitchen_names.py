@@ -127,13 +127,14 @@ class Command(BaseCommand):
 
                         # Create a base slug from the new name
                         base_slug = slugify(new_name)
+                        if not base_slug:  # If slugify returns empty
+                            base_slug = f"item-{item.pk}"  # Fallback to item's primary key
                         slug = base_slug
 
                         # Check if the slug already exists for another item
                         counter = 1
                         while FurnitureItem.objects.filter(
-                            ~Q(pk=item.pk),  # Exclude current item
-                            slug=slug,
+                            ~Q(pk=item.pk), slug=slug,
                         ).exists():
                             slug = f"{base_slug}-{counter}"
                             counter += 1
