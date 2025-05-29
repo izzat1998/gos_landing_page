@@ -384,9 +384,8 @@ class QRStatsBot:
                 for loc in locations:
                     loc_scans = await count_location_scans(loc.id, start)
                     loc_phone_clicks = await count_location_phone_clicks(loc.id, start)
-                    # Only include locations with activity
-                    if loc_scans > 0 or loc_phone_clicks > 0:
-                        loc_stats.append((loc.name, loc_scans, loc_phone_clicks))
+                    # Include all locations regardless of activity
+                    loc_stats.append((loc.name, loc_scans, loc_phone_clicks))
 
                 # Sort by total scans (most active first)
                 loc_stats.sort(key=lambda x: x[1], reverse=True)
