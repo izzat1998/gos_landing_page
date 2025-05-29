@@ -94,6 +94,7 @@ class Command(BaseCommand):
                     self.stdout.write(f"Updated description for: {item.name}")
             else:
                 not_found_ids.append(furniture_id)
+                
 
         # Summary
         self.stdout.write(
