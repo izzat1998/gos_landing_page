@@ -29,16 +29,33 @@ class Command(BaseCommand):
             for category_name, items in data.items():
                 self.stdout.write(f"Processing category: {category_name}")
 
+                # Generate a valid slug for the category
+                category_slug = slugify(category_name)
+                if not category_slug:
+                    # If slugify produces an empty string (e.g., for non-Latin characters),
+                    # create a slug based on a transliteration or a default value
+                    if category_name == "Детская мебель":
+                        category_slug = "kids-furniture"
+                    elif category_name == "Офисная мебель":
+                        category_slug = "office-furniture"
+                    else:
+                        category_slug = f"category-{len(category_name)}-{hash(category_name) % 10000}"
+                
                 # Find or create the category
                 category, created = FurnitureCategory.objects.get_or_create(
                     name=category_name,
                     defaults={
-                        "slug": slugify(category_name),
+                        "slug": category_slug,
                         "description": f"Collection of {category_name.lower()}",
                         "order": 0,
                         "is_active": True,
                     },
                 )
+                
+                # If the category exists but has an empty slug, update it
+                if not created and not category.slug:
+                    category.slug = category_slug
+                    category.save()
 
                 if created:
                     self.stdout.write(
@@ -95,6 +112,26 @@ class Command(BaseCommand):
                             )
                         )
 
+            # Fix any existing items with empty slugs
+            self.stdout.write("Checking for items with empty slugs...")
+            items_with_empty_slugs = FurnitureItem.objects.filter(slug="")
+            for item in items_with_empty_slugs:
+                item.slug = f"furniture-item-{item.id}"
+                item.save()
+                self.stdout.write(self.style.SUCCESS(f"Fixed empty slug for item: {item.name}"))
+            
+            # Fix any existing categories with empty slugs
+            categories_with_empty_slugs = FurnitureCategory.objects.filter(slug="")
+            for category in categories_with_empty_slugs:
+                if category.name == "Детская мебель":
+                    category.slug = "kids-furniture"
+                elif category.name == "Офисная мебель":
+                    category.slug = "office-furniture"
+                else:
+                    category.slug = f"category-{category.id}"
+                category.save()
+                self.stdout.write(self.style.SUCCESS(f"Fixed empty slug for category: {category.name}"))
+            
             self.stdout.write(
                 self.style.SUCCESS("Furniture data update completed successfully!")
             )
