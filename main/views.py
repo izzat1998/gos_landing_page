@@ -174,3 +174,12 @@ class FurnitureDetailView(DetailView):
             is_active=True
         ).exclude(id=item.id)[:4]
         return context
+
+
+class SeeItInYourRoomView(TemplateView):
+    template_name = "see_it_in_your_room/see_it.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "See it in Your Room"
+        return context

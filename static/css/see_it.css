@@ -1,0 +1,170 @@
+/* General Container for the Feature */
+.sir-container {
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.sir-container h1, .sir-container h2 {
+    margin-bottom: 15px;
+    color: var(--text-color); /* Using theme variable */
+}
+
+/* Main Layout: Room Area and Furniture Panel */
+.sir-main-layout {
+    display: flex;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.sir-room-area {
+    flex: 3; /* Takes more space */
+    min-width: 300px; /* Minimum width before wrapping */
+    padding: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--background-alt-color);
+}
+
+.sir-furniture-panel {
+    flex: 1; /* Takes less space */
+    min-width: 200px; /* Minimum width for the panel */
+    padding: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--background-alt-color);
+    max-height: 600px; /* Limit height and allow scrolling for furniture items */
+    overflow-y: auto;
+}
+
+/* Room Image Upload Section */
+.sir-upload-section {
+    margin-bottom: 15px;
+}
+
+/* Room Display Area */
+.sir-room-display {
+    width: 100%;
+    height: 400px; /* Adjust as needed, or make it dynamic */
+    border: 2px dashed var(--primary-color-light); /* Dashed border */
+    border-radius: 8px;
+    position: relative; /* Crucial for positioning furniture items absolutely */
+    background-color: #f0f0f0; /* Placeholder background */
+    background-size: contain; /* Scale room image to fit */
+    background-repeat: no-repeat;
+    background-position: center;
+    overflow: hidden; /* Keep furniture items contained */
+    color: var(--text-muted-color);
+}
+
+.sir-room-display .sir-placeholder-text {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    font-style: italic;
+}
+
+/* Furniture Selector */
+.sir-furniture-selector {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); /* Responsive grid */
+    gap: 10px;
+}
+
+.sir-furniture-selector img {
+    width: 100%;
+    height: auto;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: border-color 0.3s ease, transform 0.2s ease;
+}
+
+.sir-furniture-selector img:hover {
+    border-color: var(--primary-color);
+    transform: scale(1.05);
+}
+
+/* Placed Furniture Items (initial style, will be manipulated by JS) */
+.sir-furniture-item {
+    position: absolute; /* Positioned relative to sir-room-display */
+    cursor: grab; /* Indicates draggable */
+    /* Base size, JS will set actual dimensions based on image */
+    max-width: 100px;
+    user-select: none; /* Prevent text selection when dragging */
+    /* Add a subtle shadow to lift it a bit */
+    /* box-shadow: 0 4px 8px rgba(0,0,0,0.1); */ /* Might be too much for unselected */
+}
+
+.sir-furniture-item.selected {
+    outline: 2px solid var(--accent-color); /* Highlight selected item */
+    box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+}
+
+/* Resize Handles (to be added by JS) */
+.sir-resize-handle {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: var(--accent-color);
+    border: 1px solid var(--background-color);
+    border-radius: 2px;
+    z-index: 10; /* Ensure handles are on top of the item */
+}
+
+/* Example handle positions (JS will set these) */
+/* .sir-resize-handle.tl { top: -5px; left: -5px; cursor: nwse-resize; } */
+/* .sir-resize-handle.tr { top: -5px; right: -5px; cursor: nesw-resize; } */
+/* .sir-resize-handle.bl { bottom: -5px; left: -5px; cursor: nesw-resize; } */
+/* .sir-resize-handle.br { bottom: -5px; right: -5px; cursor: nwse-resize; } */
+
+/* Rotation Handle (to be added by JS) */
+.sir-rotate-handle {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background-color: var(--accent-color);
+    border: 1px solid var(--background-color);
+    border-radius: 50%; /* Circular handle */
+    top: -20px; /* Position above the item */
+    left: calc(50% - 6px); /* Center the handle */
+    cursor: grab; /* Or a specific rotation cursor if available */
+    z-index: 10;
+}
+
+
+/* Controls Area */
+.sir-controls-area {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--background-alt-color);
+}
+
+.sir-controls-area button {
+    margin-right: 10px;
+}
+
+/* Utility to hide elements if needed */
+.sir-hidden {
+    display: none !important;
+}
+
+/* Ensure theme variables are available or provide fallbacks if this CSS is loaded standalone */
+:root {
+    --text-color: #333;
+    --text-muted-color: #777;
+    --border-color: #ddd;
+    --background-color: #fff;
+    --background-alt-color: #f9f9f9;
+    --primary-color: #007bff;
+    --primary-color-light: #79bbff;
+    --accent-color: #ffc107;
+    /* Add other variables used in base.css if necessary */
+}
+
+/* If your theme.css already defines these, this :root block might be redundant, */
+/* but it's good for fallback or if see_it.css is ever used more independently. */
+/* Check your base.css or theme.css to ensure consistency. */

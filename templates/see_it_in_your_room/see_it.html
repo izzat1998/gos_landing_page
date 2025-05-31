@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} - GOS Мебель{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/see_it.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container sir-container"> {# SIR for See It in Room #}
+    <h1>{{ title }}</h1>
+    <p>Upload an image of your room and place our furniture in it!</p>
+
+    <div class="sir-main-layout">
+        <div class="sir-room-area">
+            <h2>Your Room</h2>
+            <div class="sir-upload-section">
+                <label for="roomImageUpload" class="btn btn-primary">Upload Room Image</label>
+                <input type="file" id="roomImageUpload" accept="image/*" style="display: none;">
+            </div>
+            <div id="roomDisplay" class="sir-room-display">
+                <!-- Room image will be background here, furniture items will be added as img elements -->
+                <p class="sir-placeholder-text">Your room image will appear here.</p>
+            </div>
+        </div>
+
+        <div class="sir-furniture-panel">
+            <h2>Select Furniture</h2>
+            <div id="furnitureSelector" class="sir-furniture-selector">
+                <!-- Furniture thumbnails will be loaded here by JavaScript -->
+                <p>Loading furniture...</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="sir-controls-area">
+        <h2>Controls</h2>
+        <button id="resetButton" class="btn btn-danger">Reset</button>
+        <button id="saveImageButton" class="btn btn-success">Save Image</button>
+        <!-- More controls can be added here, e.g., for selected item actions -->
+    </div>
+
+    <!-- Templates for dynamic elements (optional but good practice) -->
+    <template id="furnitureItemTemplate">
+        <img src="" alt="" class="sir-furniture-item" style="position: absolute; cursor: grab;">
+        <!-- Resize and rotate handles will be added by JS when selected -->
+    </template>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/see_it.js' %}" defer></script>
+{% endblock %}

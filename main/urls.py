@@ -11,9 +11,11 @@ from .views import (
     LocationStatsAPIView,
     LocationVisitView,
     RecordPhoneClickView,
+    SeeItInYourRoomView,
 )
 
 urlpatterns = [
+    path("see-it-in-your-room/", SeeItInYourRoomView.as_view(), name="see_it_in_your_room"),
     path("", LandingPageView.as_view(), name="main_page"),
     path("qrcode/<int:pk>/", LocationQRCodeView.as_view(), name="location_qrcode"),
     path(

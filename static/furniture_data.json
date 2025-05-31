@@ -1,0 +1,16 @@
+[
+  {
+    "id": "wardrobe1",
+    "name": "Classic Wardrobe",
+    "image_url": "/static/shkaf/1.jpg",
+    "thumbnail_url": "/static/shkaf/1.jpg",
+    "category": "wardrobes"
+  },
+  {
+    "id": "bed1",
+    "name": "Modern Bed",
+    "image_url": "/static/spalni/s3.jpg",
+    "thumbnail_url": "/static/spalni/s3.jpg",
+    "category": "beds"
+  }
+]
