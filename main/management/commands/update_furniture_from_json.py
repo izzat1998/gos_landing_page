@@ -15,7 +15,7 @@ class Command(BaseCommand):
             "--json-file",
             type=str,
             help="Path to JSON file with furniture data",
-            default="/home/izzat/Tohir aka/gos-landing-page/all_files.json",
+            default="/var/www/gos_landing_page/all_files.json",
         )
 
     def handle(self, *args, **options):
