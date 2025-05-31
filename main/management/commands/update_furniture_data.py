@@ -40,7 +40,7 @@ class Command(BaseCommand):
                         category_slug = "office-furniture"
                     else:
                         category_slug = f"category-{len(category_name)}-{hash(category_name) % 10000}"
-                
+
                 # Find or create the category
                 category, created = FurnitureCategory.objects.get_or_create(
                     name=category_name,
@@ -51,7 +51,7 @@ class Command(BaseCommand):
                         "is_active": True,
                     },
                 )
-                
+
                 # If the category exists but has an empty slug, update it
                 if not created and not category.slug:
                     category.slug = category_slug
@@ -118,8 +118,10 @@ class Command(BaseCommand):
             for item in items_with_empty_slugs:
                 item.slug = f"furniture-item-{item.id}"
                 item.save()
-                self.stdout.write(self.style.SUCCESS(f"Fixed empty slug for item: {item.name}"))
-            
+                self.stdout.write(
+                    self.style.SUCCESS(f"Fixed empty slug for item: {item.name}")
+                )
+
             # Fix any existing categories with empty slugs
             categories_with_empty_slugs = FurnitureCategory.objects.filter(slug="")
             for category in categories_with_empty_slugs:
@@ -130,8 +132,12 @@ class Command(BaseCommand):
                 else:
                     category.slug = f"category-{category.id}"
                 category.save()
-                self.stdout.write(self.style.SUCCESS(f"Fixed empty slug for category: {category.name}"))
-            
+                self.stdout.write(
+                    self.style.SUCCESS(
+                        f"Fixed empty slug for category: {category.name}"
+                    )
+                )
+
             self.stdout.write(
                 self.style.SUCCESS("Furniture data update completed successfully!")
             )
