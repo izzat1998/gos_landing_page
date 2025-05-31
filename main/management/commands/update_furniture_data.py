@@ -35,10 +35,10 @@ class Command(BaseCommand):
             # Process each category
             for category_name, items in data.items():
                 self.stdout.write(f"Processing category: {category_name}")
-                
+
                 # Map to the correct database category name if it exists
                 db_category_name = CATEGORY_MAPPING.get(category_name, category_name)
-                
+
                 # Try to find the existing category
                 try:
                     category = FurnitureCategory.objects.get(name=db_category_name)
@@ -46,7 +46,7 @@ class Command(BaseCommand):
                 except FurnitureCategory.DoesNotExist:
                     # If category doesn't exist, create a new one with a proper slug
                     category_slug = ""
-                    
+
                     # Determine the slug based on what we see in the database
                     if db_category_name == "Детская мебель":
                         category_slug = "detskaya-mebel"
@@ -64,17 +64,24 @@ class Command(BaseCommand):
                         category_slug = "shkaf"
                     else:
                         # Fallback for any new categories
-                        category_slug = slugify(db_category_name) or f"category-{hash(db_category_name) % 10000}"
-                    
+                        category_slug = (
+                            slugify(db_category_name)
+                            or f"category-{hash(db_category_name) % 10000}"
+                        )
+
                     category = FurnitureCategory.objects.create(
                         name=db_category_name,
                         slug=category_slug,
                         description=f"Collection of {db_category_name.lower()}",
                         order=0,
-                        is_active=True
+                        is_active=True,
                     )
-                    self.stdout.write(self.style.SUCCESS(f"Created new category: {db_category_name} with slug: {category_slug}"))
-                
+                    self.stdout.write(
+                        self.style.SUCCESS(
+                            f"Created new category: {db_category_name} with slug: {category_slug}"
+                        )
+                    )
+
                 # Ensure the category has a valid slug
                 if not category.slug:
                     if db_category_name == "Детская мебель":
@@ -84,7 +91,11 @@ class Command(BaseCommand):
                     else:
                         category.slug = f"category-{category.id}"
                     category.save()
-                    self.stdout.write(self.style.SUCCESS(f"Updated empty slug for category: {category.name}"))
+                    self.stdout.write(
+                        self.style.SUCCESS(
+                            f"Updated empty slug for category: {category.name}"
+                        )
+                    )
 
                 # This section is now handled in the try/except block above
 
@@ -138,14 +149,13 @@ class Command(BaseCommand):
                         if not new_slug:
                             # Create a unique slug if slugify produces an empty string
                             new_slug = f"item-{hash(new_name) % 10000}"
-                        
+
                         # Create the new item
-                        new_item = FurnitureItem.objects.create(
+                        FurnitureItem.objects.create(
                             name=new_name,
                             slug=new_slug,
                             description=description,
                             category=category,
-                            main_image="default.jpg",  # Default image
                             is_featured=False,
                             is_active=True,
                             dimensions="",  # Empty dimensions
