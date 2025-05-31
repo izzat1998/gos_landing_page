@@ -75,7 +75,13 @@ class Command(BaseCommand):
                         for item in items:
                             item.name = new_name
                             item.description = description
-                            item.slug = slugify(new_name)
+                            # Ensure slug is never empty
+                            new_slug = slugify(new_name)
+                            if not new_slug:
+                                # If slugify produces an empty string (e.g., for non-Latin characters),
+                                # create a slug based on the item ID
+                                new_slug = f"furniture-item-{item.id}"
+                            item.slug = new_slug
                             item.save()
                             self.stdout.write(
                                 self.style.SUCCESS(
