@@ -6,6 +6,13 @@ from django.utils.text import slugify
 
 from main.models import FurnitureCategory, FurnitureItem
 
+# Category mapping from JSON file to database categories
+CATEGORY_MAPPING = {
+    "Детская мебель": "Детская мебель",
+    "Офисная мебель": "Офисная Мебель",
+    # Add other mappings if needed
+}
+
 
 class Command(BaseCommand):
     help = "Update furniture items with new names and descriptions from JSON file"
@@ -28,39 +35,58 @@ class Command(BaseCommand):
             # Process each category
             for category_name, items in data.items():
                 self.stdout.write(f"Processing category: {category_name}")
-
-                # Generate a valid slug for the category
-                category_slug = slugify(category_name)
-                if not category_slug:
-                    # If slugify produces an empty string (e.g., for non-Latin characters),
-                    # create a slug based on a transliteration or a default value
-                    if category_name == "Детская мебель":
-                        category_slug = "kids-furniture"
-                    elif category_name == "Офисная мебель":
-                        category_slug = "office-furniture"
+                
+                # Map to the correct database category name if it exists
+                db_category_name = CATEGORY_MAPPING.get(category_name, category_name)
+                
+                # Try to find the existing category
+                try:
+                    category = FurnitureCategory.objects.get(name=db_category_name)
+                    self.stdout.write(f"Found existing category: {db_category_name}")
+                except FurnitureCategory.DoesNotExist:
+                    # If category doesn't exist, create a new one with a proper slug
+                    category_slug = ""
+                    
+                    # Determine the slug based on what we see in the database
+                    if db_category_name == "Детская мебель":
+                        category_slug = "detskaya-mebel"
+                    elif db_category_name == "Офисная Мебель":
+                        category_slug = "ofisnaya-mebel"
+                    elif db_category_name == "Кухни":
+                        category_slug = "kuhni"
+                    elif db_category_name == "Мягкая Мебель":
+                        category_slug = "myahkii-mebel"
+                    elif db_category_name == "Под ТВ":
+                        category_slug = "gostinye"
+                    elif db_category_name == "Спальни":
+                        category_slug = "spalni"
+                    elif db_category_name == "Шкафы":
+                        category_slug = "shkaf"
                     else:
-                        category_slug = f"category-{len(category_name)}-{hash(category_name) % 10000}"
-
-                # Find or create the category
-                category, created = FurnitureCategory.objects.get_or_create(
-                    name=category_name,
-                    defaults={
-                        "slug": category_slug,
-                        "description": f"Collection of {category_name.lower()}",
-                        "order": 0,
-                        "is_active": True,
-                    },
-                )
-
-                # If the category exists but has an empty slug, update it
-                if not created and not category.slug:
-                    category.slug = category_slug
-                    category.save()
-
-                if created:
-                    self.stdout.write(
-                        self.style.SUCCESS(f"Created new category: {category_name}")
+                        # Fallback for any new categories
+                        category_slug = slugify(db_category_name) or f"category-{hash(db_category_name) % 10000}"
+                    
+                    category = FurnitureCategory.objects.create(
+                        name=db_category_name,
+                        slug=category_slug,
+                        description=f"Collection of {db_category_name.lower()}",
+                        order=0,
+                        is_active=True
                     )
+                    self.stdout.write(self.style.SUCCESS(f"Created new category: {db_category_name} with slug: {category_slug}"))
+                
+                # Ensure the category has a valid slug
+                if not category.slug:
+                    if db_category_name == "Детская мебель":
+                        category.slug = "detskaya-mebel"
+                    elif db_category_name == "Офисная Мебель":
+                        category.slug = "ofisnaya-mebel"
+                    else:
+                        category.slug = f"category-{category.id}"
+                    category.save()
+                    self.stdout.write(self.style.SUCCESS(f"Updated empty slug for category: {category.name}"))
+
+                # This section is now handled in the try/except block above
 
                 # Process each item in the category
                 for item_data in items:
@@ -106,9 +132,28 @@ class Command(BaseCommand):
                                 )
                             )
                     else:
+                        # Create a new item
+                        # Generate a valid slug
+                        new_slug = slugify(new_name)
+                        if not new_slug:
+                            # Create a unique slug if slugify produces an empty string
+                            new_slug = f"item-{hash(new_name) % 10000}"
+                        
+                        # Create the new item
+                        new_item = FurnitureItem.objects.create(
+                            name=new_name,
+                            slug=new_slug,
+                            description=description,
+                            category=category,
+                            main_image="default.jpg",  # Default image
+                            is_featured=False,
+                            is_active=True,
+                            dimensions="",  # Empty dimensions
+                            materials="",  # Empty materials
+                        )
                         self.stdout.write(
-                            self.style.WARNING(
-                                f"Item not found: {old_name} / {new_name}"
+                            self.style.SUCCESS(
+                                f"Created new item: {new_name} (from {old_name})"
                             )
                         )
 
