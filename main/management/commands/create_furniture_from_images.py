@@ -16,7 +16,7 @@ class Command(BaseCommand):
             "--directory",
             type=str,
             help="Directory containing images to use for furniture items",
-            default="/var/www/gos-landing-page/detskaya mebel",
+            default="/var/www/gos_landing_page/detskaya mebel",
         )
         parser.add_argument(
             "--category",
