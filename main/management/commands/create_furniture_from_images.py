@@ -16,19 +16,19 @@ class Command(BaseCommand):
             "--directory",
             type=str,
             help="Directory containing images to use for furniture items",
-            default="/var/www/gos_landing_page/shkaf",
+            default="/var/www/gos_landing_page/pod_tv",
         )
         parser.add_argument(
             "--category",
             type=str,
             help="Category name for the furniture items",
-            default="Шкафы",
+            default="Под ТВ",
         )
         parser.add_argument(
             "--prefix",
             type=str,
             help="Prefix for the sequential naming",
-            default="shkaf",
+            default="pod_tv",
         )
 
     def handle(self, *args, **options):
